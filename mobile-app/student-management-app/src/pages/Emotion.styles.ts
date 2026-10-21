@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   fabLoadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(255,255,255,0.3)",

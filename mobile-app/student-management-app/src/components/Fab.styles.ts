@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     maxWidth: 300,
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: '#000000',
   },
   backdropTouchable: {

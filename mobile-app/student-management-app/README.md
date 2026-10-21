@@ -1,6 +1,6 @@
 # SJDSF Student Management System - Mobile App
 
-Cross-platform mobile application for trainees and students, built with **React Native**, **Expo (SDK 53)**, and **TypeScript**.
+Cross-platform mobile application for trainees and students, built with **React Native**, **Expo (SDK 57)**, and **TypeScript**.
 
 ---
 
