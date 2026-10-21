@@ -1,6 +1,7 @@
 export const API_URL =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL) ||
-  "/choreo-apis/student-management-system/backend/v1";
+  (typeof window !== "undefined" && window.config?.apiUrl) ||
+  "http://localhost:8080";
 export const SUMMARIZER_API_URL =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_SUMMARIZER_API_URL) ||
   "/choreo-apis/student-management-system/summarizer/v1";

@@ -1,3 +1,6 @@
+import Constants from "expo-constants";
+import { Platform } from "react-native";
+
 /**
  * Local switch to run locally without Azure/Choreo cloud backend
  * Set `IS_LOCAL = true` for local development against local Go server (default: port 8080)
@@ -6,12 +9,15 @@
 export const IS_LOCAL = true;
 
 /**
- * Configure your local development host:
- * - "localhost": iOS simulator, Web preview, or adb reverse port forwarding
- * - "10.0.2.2": Android Studio Emulator default host loopback
- * - "<your-lan-ip>": (e.g. "192.168.1.15") Physical device running Expo Go on the same Wi-Fi
+ * Auto-detect local development host:
+ * - When running on a physical phone via Expo Go, dynamically uses your computer's LAN IP
+ * - When running on Android Studio Emulator, falls back to 10.0.2.2
+ * - When running on iOS Simulator or Web, falls back to localhost
  */
-export const LOCAL_HOST = "localhost";
+const metroHost = Constants.expoConfig?.hostUri?.split(":")[0];
+
+export const LOCAL_HOST =
+  metroHost || (Platform.OS === "android" ? "10.0.2.2" : "localhost");
 export const LOCAL_PORT = "8080";
 
 export const LOCAL_BASE_URL = `http://${LOCAL_HOST}:${LOCAL_PORT}`;
