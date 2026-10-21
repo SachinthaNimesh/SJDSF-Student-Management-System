@@ -1,4 +1,4 @@
-// AuthContext.tsx - Fixed to work with current authUtils
+// AuthContext.tsx - Coordinates authentication state supporting both local and Azure/Choreo auth
 import React, {
   createContext,
   useContext,
@@ -7,17 +7,14 @@ import React, {
   ReactNode,
 } from "react";
 import {
-  getUserInfoFromCookie,
-  getUserInfoFromEndpoint,
+  getUserInfo,
   logout as authUtilsLogout,
+  UserInfo,
+  isLocalAuth,
+  MOCK_LOCAL_USER,
 } from "../../utils/authUtils";
 
-// Define UserInfo interface locally since it's not exported from authUtils
-export interface UserInfo {
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-}
+export type { UserInfo };
 
 interface AuthContextType {
   user: UserInfo | null;
@@ -32,20 +29,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 interface AuthProviderProps {
   children: ReactNode;
 }
-const getUserInfo = async (): Promise<UserInfo | null> => {
-  let userInfo = getUserInfoFromCookie();
-  if (userInfo) {
-    return userInfo;
-  }
-
-  // If not in cookie, try endpoint
-  userInfo = await getUserInfoFromEndpoint();
-  if (userInfo) {
-    return userInfo;
-  }
-
-  return null;
-};
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserInfo | null>(null);
@@ -59,7 +42,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(userInfo);
     } catch (error) {
       console.error("Error fetching user info:", error);
-      setUser(null);
+      if (isLocalAuth()) {
+        setUser(MOCK_LOCAL_USER);
+      } else {
+        setUser(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -68,7 +55,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Function to handle logout
   const logout = () => {
     setUser(null);
-    // Use the logout function from authUtils
     authUtilsLogout();
   };
 

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_URL } from '../config/configs';
+import { isLocalAuth } from '../utils/authUtils';
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -33,12 +34,15 @@ apiClient.interceptors.response.use(
       if (status === 401 || status === 403) {
         console.warn('Authentication error detected:', status);
         
-        // Clear any stored user info
-        localStorage.removeItem('userInfo');
-        sessionStorage.removeItem('userInfo');
-        
-        // Redirect to login page
-        window.location.href = '/auth/login';
+        // Only redirect to Azure /auth/login in cloud/Choreo mode
+        if (!isLocalAuth()) {
+          // Clear any stored user info
+          localStorage.removeItem('userInfo');
+          sessionStorage.removeItem('userInfo');
+          
+          // Redirect to login page
+          window.location.href = '/auth/login';
+        }
         return Promise.reject(new Error('Authentication failed'));
       }
       

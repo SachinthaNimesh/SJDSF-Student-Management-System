@@ -10,6 +10,7 @@ import (
 	"log"
 	"math/big"
 	"net/http"
+	"os"
 	"server/database"
 	"server/models"
 	"strconv"
@@ -255,6 +256,53 @@ func (s *AuthService) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/generate-otp", s.HandleGenerateOTP).Methods("POST")
 	router.HandleFunc("/validate-otp", s.HandleValidateOTP).Methods("POST")
 	router.HandleFunc("/verify-device-auth", s.HandleVerifyDeviceAuth).Methods("POST")
+
+	authMode := os.Getenv("AUTH_MODE")
+	if authMode == "" || authMode == "local" {
+		log.Println("[AUTH] Local auth switch active: mock Azure auth endpoints enabled at /auth/*")
+		router.HandleFunc("/auth/userinfo", s.HandleLocalUserInfo).Methods("GET", "OPTIONS")
+		router.HandleFunc("/auth/login", s.HandleLocalLogin).Methods("GET", "POST", "OPTIONS")
+		router.HandleFunc("/auth/logout", s.HandleLocalLogout).Methods("GET", "POST", "OPTIONS")
+		router.HandleFunc("/auth/token", s.HandleLocalToken).Methods("POST", "OPTIONS")
+	} else {
+		log.Printf("[AUTH] Running in %s auth mode (expecting Choreo/Azure gateway)", authMode)
+	}
+}
+
+// HandleLocalUserInfo returns mock Azure/Choreo userinfo for local development
+func (s *AuthService) HandleLocalUserInfo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"first_name": "Local",
+		"last_name":  "Admin",
+		"email":      "admin@sjdsf.local",
+		"roles":      []string{"admin"},
+	})
+}
+
+// HandleLocalLogin redirects to local frontend dashboard or returns a success response
+func (s *AuthService) HandleLocalLogin(w http.ResponseWriter, r *http.Request) {
+	referer := r.Header.Get("Referer")
+	if referer != "" {
+		http.Redirect(w, r, referer, http.StatusFound)
+		return
+	}
+	http.Redirect(w, r, "http://localhost:5173/dashboard", http.StatusFound)
+}
+
+// HandleLocalLogout redirects to local frontend landing page
+func (s *AuthService) HandleLocalLogout(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "http://localhost:5173/", http.StatusFound)
+}
+
+// HandleLocalToken returns a mock OAuth token for Azure Graph API simulations
+func (s *AuthService) HandleLocalToken(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"access_token": "mock-local-azure-token-for-development",
+		"token_type":   "Bearer",
+		"expires_in":   "86400",
+	})
 }
 
 // Helper function to generate a random 4-digit OTP

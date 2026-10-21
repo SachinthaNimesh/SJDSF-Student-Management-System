@@ -1,21 +1,28 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { isLocalAuth, MOCK_LOCAL_USER, storeUserInfo } from '../../utils/authUtils';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, setUser } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading && !user) {
-      // User is not authenticated, redirect to login
-      navigate('/auth/login');
+      if (isLocalAuth()) {
+        // Auto-authenticate with mock user in local mode
+        storeUserInfo(MOCK_LOCAL_USER);
+        setUser(MOCK_LOCAL_USER);
+      } else {
+        // Redirect to Azure AD login in cloud/Choreo mode
+        window.location.href = '/auth/login';
+      }
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, setUser]);
 
   // Show loading state while checking authentication
   if (loading) {
@@ -26,8 +33,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  // If not authenticated, don't render children
-  if (!user) {
+  // If not authenticated and not in local mode, don't render children
+  if (!user && !isLocalAuth()) {
     return null;
   }
 

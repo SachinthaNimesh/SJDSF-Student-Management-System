@@ -80,6 +80,11 @@ Open `.env` and fill in your connection details:
 ```env
 PORT=8080
 
+# Authentication Mode
+# 'local': Bypasses Azure AD auth, provides mock /auth/userinfo & /auth/login for local dev
+# 'azure': For production Choreo/Azure AD deployment
+AUTH_MODE=local
+
 # --- Option 1: Full Database URL ---
 # DATABASE_URL=postgres://postgres:password@localhost:5432/student_management?sslmode=disable
 

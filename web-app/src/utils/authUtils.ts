@@ -1,4 +1,4 @@
-// authUtils.ts - Complete enhanced version without isLocal logic
+// authUtils.ts - Supports both local development switch and Azure/Choreo managed auth
 import Cookies from "js-cookie";
 
 export interface UserInfo {
@@ -7,16 +7,55 @@ export interface UserInfo {
   email?: string;
 }
 
+/**
+ * Local auth switch helper:
+ * Returns true if running locally (localhost / 127.0.0.1) or if VITE_ENABLE_LOCAL_AUTH=true.
+ * Can be explicitly disabled by setting VITE_ENABLE_LOCAL_AUTH=false.
+ */
+export function isLocalAuth(): boolean {
+  if (typeof window !== "undefined") {
+    // Check runtime window config if injected
+    const winConfig = window.config?.VITE_ENABLE_LOCAL_AUTH;
+    if (winConfig === "false") return false;
+    if (winConfig === "true") return true;
+
+    // Check Vite environment variable
+    const envVal = import.meta.env?.VITE_ENABLE_LOCAL_AUTH;
+    if (envVal === "false") return false;
+    if (envVal === "true") return true;
+
+    // Fall back to detecting localhost / 127.0.0.1
+    const host = window.location.hostname;
+    return host === "localhost" || host === "127.0.0.1";
+  }
+  return false;
+}
+
+export const MOCK_LOCAL_USER: UserInfo = {
+  first_name: "Local",
+  last_name: "Admin",
+  email: "admin@sjdsf.local",
+};
+
 export function login() {
+  if (isLocalAuth()) {
+    storeUserInfo(MOCK_LOCAL_USER);
+    window.location.href = "/dashboard";
+    return;
+  }
   window.location.href = "/auth/login";
 }
 
 export function logout() {
-  // Clear all stored user info before logout
   clearStoredUserInfo();
 
+  if (isLocalAuth()) {
+    window.location.href = "/";
+    return;
+  }
+
   const sessionHint = Cookies.get("session_hint");
-  window.location.href = `/auth/logout?session_hint=${sessionHint}`;
+  window.location.href = `/auth/logout${sessionHint ? `?session_hint=${sessionHint}` : ""}`;
 }
 
 export function getUserInfoFromCookie(): UserInfo | null {
@@ -26,15 +65,20 @@ export function getUserInfoFromCookie(): UserInfo | null {
       const userInfo = JSON.parse(atob(encodedUserInfo));
       Cookies.remove("userinfo", { path: "/" });
       return userInfo;
-    } catch (e) {
+    } catch {
       Cookies.remove("userinfo", { path: "/" });
       return null;
     }
   }
+
   return null;
 }
 
 export async function getUserInfoFromEndpoint(): Promise<UserInfo | null> {
+  if (isLocalAuth()) {
+    return MOCK_LOCAL_USER;
+  }
+
   try {
     const response = await fetch("/auth/userinfo");
     if (response.ok) {
@@ -46,7 +90,7 @@ export async function getUserInfoFromEndpoint(): Promise<UserInfo | null> {
   }
 }
 
-// New utility functions for user info persistence
+// Utility functions for user info persistence
 export function storeUserInfo(userInfo: UserInfo): void {
   const userInfoString = JSON.stringify(userInfo);
   localStorage.setItem("userInfo", userInfoString);
@@ -60,7 +104,6 @@ export function getStoredUserInfo(): UserInfo | null {
     try {
       return JSON.parse(userInfo);
     } catch {
-      // If parsing fails, remove corrupted data
       localStorage.removeItem("userInfo");
     }
   }
@@ -71,7 +114,6 @@ export function getStoredUserInfo(): UserInfo | null {
     try {
       return JSON.parse(userInfo);
     } catch {
-      // If parsing fails, remove corrupted data
       sessionStorage.removeItem("userInfo");
     }
   }
@@ -106,6 +148,12 @@ export async function getUserInfo(): Promise<UserInfo | null> {
     return userInfo;
   }
 
+  // If local auth switch is active and still no user found, return mock user
+  if (isLocalAuth()) {
+    storeUserInfo(MOCK_LOCAL_USER);
+    return MOCK_LOCAL_USER;
+  }
+
   return null;
 }
 
@@ -113,9 +161,12 @@ export async function performGet(url: string) {
   try {
     const response = await fetch(url);
     if (response.status === 401) {
-      // Clear user info on unauthorized access
       clearStoredUserInfo();
-      window.location.href = "/auth/login";
+      if (!isLocalAuth()) {
+        window.location.href = "/auth/login";
+      } else {
+        window.location.href = "/";
+      }
     }
     return response;
   } catch (error) {

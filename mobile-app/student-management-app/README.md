@@ -34,28 +34,29 @@ cd mobile-app/student-management-app
 npm install
 ```
 
-### 2. Configure Backend URL
+### 2. Configure Local Switch / Backend URL
 
-Open [`config/config.ts`](config/config.ts) and set `BASE_URL` depending on your testing target:
+Open [`config/config.ts`](config/config.ts) where the **`IS_LOCAL`** switch is provided:
 
-* **iOS Simulator**:
-  ```ts
-  export const BASE_URL = "http://localhost:8080";
-  ```
-* **Android Studio Emulator**:
-  ```ts
-  export const BASE_URL = "http://10.0.2.2:8080";
-  ```
-* **Physical Device with Expo Go**:
-  Use your computer's local Wi-Fi IP address (run `ipconfig getifaddr en0` on macOS):
-  ```ts
-  export const BASE_URL = "http://192.168.1.15:8080"; // Replace with your Mac's IP
-  ```
-  *(Ensure your phone and Mac are connected to the exact same Wi-Fi network).*
-* **Production Deployment (Choreo)**:
-  ```ts
-  export const BASE_URL = "https://<your-choreo-service-id>.choreoapis.dev/student-management-system/backend/v1.0";
-  ```
+```ts
+// Set to true to run locally without Azure/Choreo cloud APIs
+export const IS_LOCAL = true;
+
+// Configure local host: 'localhost' for iOS simulator, '10.0.2.2' for Android emulator, or LAN IP for phone
+export const LOCAL_HOST = "localhost";
+export const LOCAL_PORT = "8080";
+
+export const LOCAL_BASE_URL = `http://${LOCAL_HOST}:${LOCAL_PORT}`;
+export const CHOREO_BASE_URL =
+  "https://87e89eab-95e5-4c0f-8192-7ee0196e1581-prod.e1-us-east-azure.choreoapis.dev/student-management-system/backend/v1.0";
+
+export const BASE_URL = IS_LOCAL ? LOCAL_BASE_URL : CHOREO_BASE_URL;
+```
+
+* **iOS Simulator / Web**: Keep `LOCAL_HOST = "localhost"`.
+* **Android Studio Emulator**: Change `LOCAL_HOST = "10.0.2.2"`.
+* **Physical Device with Expo Go**: Change `LOCAL_HOST` to your computer's local Wi-Fi IP address (run `ipconfig getifaddr en0` on macOS, e.g. `192.168.1.15`). Both devices must be on the same Wi-Fi.
+* **Testing Local OTP**: When `IS_LOCAL = true`, the OTP login screen offers a **"Local Dev: Autofill Seeded OTP (1001)"** button to log into student ID 1 instantly!
 
 ---
 

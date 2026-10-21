@@ -5,7 +5,13 @@ import { Users, Clock, Building2, LogIn, Globe, Facebook } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FaMicrosoft } from "react-icons/fa";
-console.log("Index page loaded");
+import {
+  isLocalAuth,
+  MOCK_LOCAL_USER,
+  storeUserInfo,
+  clearStoredUserInfo,
+} from "../utils/authUtils";
+
 const Index = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -22,31 +28,27 @@ const Index = () => {
         if (userInfoCookie && !localStorage.getItem("userInfo")) {
           // Fresh login - decode cookie and store user info
           const userInfo = JSON.parse(atob(userInfoCookie));
-          localStorage.setItem("userInfo", JSON.stringify(userInfo));
+          storeUserInfo(userInfo);
 
           // Clear the cookie as recommended
           Cookies.remove("userinfo", { path: "/" });
 
           setSignedIn(true);
           setUser(userInfo);
-          console.log("User signed in:", userInfo);
         }
-        // Check if user info exists in local storage (returning user)
+        // Check if user info exists in storage (returning user)
         else if (localStorage.getItem("userInfo")) {
           const userInfo = JSON.parse(localStorage.getItem("userInfo")!);
           setSignedIn(true);
           setUser(userInfo);
-          console.log("User restored from session:", userInfo);
         }
         // No authentication found
         else {
-          console.log("User is not signed in");
           setSignedIn(false);
           setUser(null);
         }
       } catch (error) {
         console.error("Error processing authentication:", error);
-        // Only log error, do not clear userInfo here
         setSignedIn(false);
         setUser(null);
       }
@@ -56,9 +58,7 @@ const Index = () => {
 
     initializeAuth();
   }, []);
-  useEffect(() => {
-    navigate("/");
-  }, [navigate]);
+
   useEffect(() => {
     // Handle errors from Managed Authentication
     const urlParams = new URLSearchParams(window.location.search);
@@ -85,15 +85,28 @@ const Index = () => {
   }, []);
 
   const handleLogin = () => {
+    if (isLocalAuth()) {
+      storeUserInfo(MOCK_LOCAL_USER);
+      setUser(MOCK_LOCAL_USER);
+      setSignedIn(true);
+      toast.success("Signed in with Local Dev account");
+      navigate("/dashboard");
+      return;
+    }
     setIsLoading(true);
     window.location.href = "/auth/login";
   };
 
   const handleLogout = () => {
     // Clear stored user info
-    localStorage.removeItem("userInfo");
+    clearStoredUserInfo();
     setSignedIn(false);
     setUser(null);
+
+    if (isLocalAuth()) {
+      toast.info("Logged out from Local session");
+      return;
+    }
 
     // Redirect to Choreo logout
     const sessionHint = Cookies.get("session_hint");
@@ -118,12 +131,25 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex flex-col">
       {/* Header with Sign In */}
       <header className="w-full py-4 px-6">
-        <div className="max-w-7xl mx-auto flex justify-end">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {isLocalAuth() && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                ● Local Auth Mode
+              </span>
+            )}
+          </div>
           {signedIn ? (
             <div className="flex items-center gap-4">
               <button
+                onClick={() => navigate("/dashboard")}
+                className="inline-flex items-center px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base shadow-lg transition-all duration-200"
+              >
+                Go to Dashboard
+              </button>
+              <button
                 onClick={handleLogout}
-                className="inline-flex items-center px-4 py-4 rounded-xl bg-[#2F2F2F] hover:bg-[#1a1a1a] text-white font-bold text-lg shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#5E5E5E] disabled:opacity-60 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-4 py-3 rounded-xl bg-[#2F2F2F] hover:bg-[#1a1a1a] text-white font-bold text-base shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#5E5E5E]"
               >
                 <LogIn className="mr-2 w-5 h-5" />
                 Logout
@@ -133,10 +159,14 @@ const Index = () => {
             <button
               onClick={handleLogin}
               disabled={isLoading}
-              className="inline-flex items-center px-4 py-4 rounded-xl bg-[#2F2F2F] hover:bg-[#1a1a1a] text-white font-bold text-lg shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#5E5E5E] disabled:opacity-60 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-5 py-3 rounded-xl bg-[#2F2F2F] hover:bg-[#1a1a1a] text-white font-bold text-base shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#5E5E5E] disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <FaMicrosoft className="mr-3 w-6 h-6" />
-              {isLoading ? "Signing in..." : "Login with Microsoft"}
+              {isLoading
+                ? "Signing in..."
+                : isLocalAuth()
+                ? "Sign in (Local Dev)"
+                : "Login with Microsoft"}
             </button>
           )}
         </div>

@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { BASE_URL } from "../../config/config";
+import { BASE_URL, IS_LOCAL } from "../../config/config";
 import styles from "./OTP.styles";
 
 type Props = {
@@ -93,6 +93,22 @@ const OTP: React.FC<Props> = ({ navigation }) => {
         <TouchableOpacity style={styles.button} onPress={handleOtpSubmit}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
+        {IS_LOCAL && (
+          <TouchableOpacity
+            style={{ marginTop: 16, padding: 8, alignItems: "center" }}
+            onPress={() => setOtp("1001")}
+          >
+            <Text
+              style={{
+                color: "#3b82f6",
+                fontSize: 13,
+                textDecorationLine: "underline",
+              }}
+            >
+              Local Dev: Autofill Seeded OTP (1001)
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

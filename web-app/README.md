@@ -38,12 +38,27 @@ VITE_API_URL=http://localhost:8080
 # For production Choreo deployment:
 # VITE_API_URL=/choreo-apis/student-management-system/backend/v1
 
+# Local Authentication Switch
+# Set to 'true' to run locally without Azure AD auth redirects (uses mock Dev/Admin user)
+# Set to 'false' when deployed on Choreo with Azure AD managed authentication
+VITE_ENABLE_LOCAL_AUTH=true
+
 # Optional API Key
 VITE_API_KEY=
 
 # Google Sheets API Key (Required for Manager Feedback page)
 VITE_GOOGLE_SHEET_API_KEY=your_google_sheets_api_key
 ```
+
+### 🔐 Local Authentication Switch vs Azure AD Mode
+
+* **Local Development (`VITE_ENABLE_LOCAL_AUTH=true` or running on `localhost`)**:
+  * Azure AD / Choreo auth redirects (`/auth/login`, `/auth/logout`) are bypassed.
+  * The home page shows **"Sign in (Local Dev)"** and signs in immediately as `Local Admin` (`admin@sjdsf.local`).
+  * Protected routes automatically grant access without locking developers out.
+  * A Vite proxy forwards any `/auth` calls to the local backend.
+* **Production Deployment (`VITE_ENABLE_LOCAL_AUTH=false`)**:
+  * Uses Choreo's managed authentication proxy with Azure AD single sign-on.
 
 ### 3. Runtime Deployment Configuration (Choreo / Production)
 
