@@ -55,12 +55,11 @@ func main() {
 
 	authService := controllers.NewAuthService()
 	authService.RegisterRoutes(router)
-	router.Use(corsMiddleware)
 
 	// Register API routes
 	routes.RegisterStudentRoutes(router)
 
-	// Start the server
+	// Start the server with CORS handler wrapping the router
 	log.Println("Server started on port", port)
-	log.Fatal(http.ListenAndServe(":"+port, router))
+	log.Fatal(http.ListenAndServe(":"+port, corsMiddleware(router)))
 }
