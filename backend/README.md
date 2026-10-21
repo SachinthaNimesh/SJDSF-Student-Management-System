@@ -53,6 +53,17 @@ psql -h localhost -U postgres -d student_management -f database/schema.sql
 
 *(Or open [`database/schema.sql`](database/schema.sql) and execute the SQL statements in your favorite database GUI like DBeaver, pgAdmin, or your cloud provider's SQL console).*
 
+### Populate Test Data (10 Rows per Table)
+
+To populate 10 sample records for each table (supervisors, employers, students, attendance, moods, OTPs, devices, and emergency contacts), run [`database/seed.sql`](database/seed.sql):
+
+```bash
+# If using local/docker psql:
+psql -h localhost -U postgres -d student_management -f database/seed.sql
+```
+
+*Note: The seeded students (IDs 1 through 10) have active test OTPs `1001` through `1010` configured so you can immediately test mobile app and dashboard OTP verification.*
+
 ---
 
 ## ⚙️ Environment Configuration
