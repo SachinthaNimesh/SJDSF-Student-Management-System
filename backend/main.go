@@ -26,7 +26,7 @@ func main() {
 	// Define router
 	router := mux.NewRouter()
 
-	// CORS Setup with proper configuration
+	// CORS Setup with proper configuration supporting credentials and all application headers
 	corsMiddleware := handlers.CORS(
 		handlers.AllowedHeaders([]string{
 			"Content-Type",
@@ -36,10 +36,16 @@ func main() {
 			"X-Requested-With",
 			"Test-Key",
 			"testkey",
+			"api-key",
 			"student-id",
+			"employer-id",
+			"supervisor-id",
+			"otp-code",
 		}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"}),
-		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowedOriginValidator(func(origin string) bool {
+			return true // dynamically reflects origin so AllowCredentials works per CORS spec
+		}),
 		handlers.AllowCredentials(),
 		handlers.ExposedHeaders([]string{
 			"Content-Length",

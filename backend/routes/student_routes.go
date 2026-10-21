@@ -36,6 +36,7 @@ func RegisterStudentRoutes(router *mux.Router) {
 	// Add mood routes
 	router.HandleFunc("/post-mood", controllers.CreateMood).Methods("POST")
 	router.HandleFunc("/get-mood", controllers.GetMoods).Methods("GET")
+	router.HandleFunc("/get-mood/{id}", controllers.GetMood).Methods("GET")
 
 	// Add card routes
 	router.HandleFunc("/dashboard", controllers.GetStudentDetails).Methods("GET")
@@ -43,9 +44,13 @@ func RegisterStudentRoutes(router *mux.Router) {
 	router.HandleFunc("/employees", controllers.GetEmployeeData).Methods("GET")
 	router.HandleFunc("/management", controllers.GetManagementTable).Methods("GET")
 	router.HandleFunc("/trainee-profile", controllers.GetTraineeProfile).Methods("GET")
+	router.HandleFunc("/employee-summary", controllers.GetEmployeeSummary).Methods("GET")
+
+	// Attendance & Location validation routes
+	router.HandleFunc("/validate-attendance", controllers.ValidateAttendanceHandler()).Methods("POST")
+	router.HandleFunc("/validate-location", controllers.ValidateLocationHandler()).Methods("POST")
 
 	router.HandleFunc("/get-supervisor-ids", controllers.GetAllSupervisorIDsAndNames).Methods("GET")
-	// router.HandleFunc("/get-employer-ids", controllers.GetAllEmployerIDsAndNames).Methods("GET")
 
 	// Manager feedback route
 	router.HandleFunc("/manager-feedback", controllers.FetchManagerFeedback).Methods("GET")

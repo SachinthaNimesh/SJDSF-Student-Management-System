@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
 	"server/database"
 	"server/models"
 	"strconv"
+	"time"
 )
 
 // GetTraineeProfile handles the request to get a trainee's profile information
@@ -72,10 +74,10 @@ func GetTraineeProfile(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch recent attendance
 	var recentAttendanceRecords []struct {
-		ScheduledCheckIn  string `json:"scheduled_check_in"`
-		ScheduledCheckOut string `json:"scheduled_check_out"`
-		ActualCheckIn     string `json:"actual_check_in"`
-		ActualCheckOut    string `json:"actual_check_out"`
+		ScheduledCheckIn  string  `json:"scheduled_check_in"`
+		ScheduledCheckOut string  `json:"scheduled_check_out"`
+		ActualCheckIn     string  `json:"actual_check_in"`
+		ActualCheckOut    *string `json:"actual_check_out"`
 	}
 
 	query := `
@@ -97,15 +99,22 @@ func GetTraineeProfile(w http.ResponseWriter, r *http.Request) {
 	} else {
 		defer rows.Close()
 		for rows.Next() {
+			var checkInDateTime time.Time
+			var checkOutDateTime sql.NullTime
 			var rec struct {
-				ScheduledCheckIn  string `json:"scheduled_check_in"`
-				ScheduledCheckOut string `json:"scheduled_check_out"`
-				ActualCheckIn     string `json:"actual_check_in"`
-				ActualCheckOut    string `json:"actual_check_out"`
+				ScheduledCheckIn  string  `json:"scheduled_check_in"`
+				ScheduledCheckOut string  `json:"scheduled_check_out"`
+				ActualCheckIn     string  `json:"actual_check_in"`
+				ActualCheckOut    *string `json:"actual_check_out"`
 			}
-			if err := rows.Scan(&rec.ScheduledCheckIn, &rec.ScheduledCheckOut, &rec.ActualCheckIn, &rec.ActualCheckOut); err != nil {
+			if err := rows.Scan(&rec.ScheduledCheckIn, &rec.ScheduledCheckOut, &checkInDateTime, &checkOutDateTime); err != nil {
 				log.Printf("Error scanning attendance row: %v", err)
 				continue
+			}
+			rec.ActualCheckIn = checkInDateTime.Format(time.RFC3339)
+			if checkOutDateTime.Valid {
+				outStr := checkOutDateTime.Time.Format(time.RFC3339)
+				rec.ActualCheckOut = &outStr
 			}
 			recentAttendanceRecords = append(recentAttendanceRecords, rec)
 		}

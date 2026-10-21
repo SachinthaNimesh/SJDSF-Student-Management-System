@@ -7,11 +7,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math"
 	"net/http"
 	"os"
 	"server/database"
+	"time"
 )
 
 type LocationResponse struct {
@@ -37,6 +38,8 @@ type googleDistanceMatrixResponse struct {
 	Status string `json:"status"`
 }
 
+var httpClient = &http.Client{Timeout: 10 * time.Second}
+
 func getGoogleDistance(lat1, lon1, lat2, lon2 float64) (int, error) {
 	apiKey := os.Getenv("GOOGLE_MAPS_API_KEY")
 	if apiKey == "" {
@@ -46,12 +49,12 @@ func getGoogleDistance(lat1, lon1, lat2, lon2 float64) (int, error) {
 		"https://maps.googleapis.com/maps/api/distancematrix/json?origins=%f,%f&destinations=%f,%f&key=%s",
 		lat1, lon1, lat2, lon2, apiKey,
 	)
-	resp, err := http.Get(url)
+	resp, err := httpClient.Get(url)
 	if err != nil {
 		return 0, err
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return 0, err
 	}
@@ -71,22 +74,17 @@ func getGoogleDistance(lat1, lon1, lat2, lon2 float64) (int, error) {
 // Haversine formula to calculate straight-line distance in meters
 func haversine(lat1, lon1, lat2, lon2 float64) int {
 	const R = 6371000 // Earth radius in meters
-	toRad := func(deg float64) float64 { return deg * (3.141592653589793 / 180) }
+	toRad := func(deg float64) float64 { return deg * (math.Pi / 180) }
 	dLat := toRad(lat2 - lat1)
 	dLon := toRad(lon2 - lon1)
 	lat1Rad := toRad(lat1)
 	lat2Rad := toRad(lat2)
 
-	a := (sin(dLat/2) * sin(dLat/2)) +
-		(cos(lat1Rad) * cos(lat2Rad) * sin(dLon/2) * sin(dLon/2))
-	c := 2 * atan2(sqrt(a), sqrt(1-a))
+	a := (math.Sin(dLat/2) * math.Sin(dLat/2)) +
+		(math.Cos(lat1Rad) * math.Cos(lat2Rad) * math.Sin(dLon/2) * math.Sin(dLon/2))
+	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
 	return int(R * c)
 }
-
-func sin(x float64) float64      { return math.Sin(x) }
-func cos(x float64) float64      { return math.Cos(x) }
-func atan2(y, x float64) float64 { return math.Atan2(y, x) }
-func sqrt(x float64) float64     { return math.Sqrt(x) }
 
 func ValidateLocationHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

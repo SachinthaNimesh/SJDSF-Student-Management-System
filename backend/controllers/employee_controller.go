@@ -4,22 +4,19 @@ import (
 	"encoding/json"
 	"net/http"
 	"server/database"
-	"time"
 )
 
 // EmployeeResponse represents the response structure for the query
 type EmployeeResponse struct {
-	StudentID       int        `json:"student_id"`
-	StudentName     string     `json:"student_name"`
-	StudentContact  string     `json:"student_contact"`
-	EmployerID      *int       `json:"employer_id,omitempty"`
-	EmployerName    *string    `json:"employer_name,omitempty"`
-	EmployerContact *string    `json:"employer_contact,omitempty"`
-	EmployerAddress *string    `json:"employer_address,omitempty"`
-	SupervisorID    *int       `json:"supervisor_id,omitempty"`
-	SupervisorName  *string    `json:"supervisor_name,omitempty"`
-	LatestOTPCode   *string    `json:"latest_otp_code,omitempty"`
-	ExpiresAt       *time.Time `json:"expires_at,omitempty"`
+	StudentID       int     `json:"student_id"`
+	StudentName     string  `json:"student_name"`
+	StudentContact  string  `json:"student_contact"`
+	EmployerID      *int    `json:"employer_id,omitempty"`
+	EmployerName    *string `json:"employer_name,omitempty"`
+	EmployerContact *string `json:"employer_contact,omitempty"`
+	EmployerAddress *string `json:"employer_address,omitempty"`
+	SupervisorID    *int    `json:"supervisor_id,omitempty"`
+	SupervisorName  *string `json:"supervisor_name,omitempty"`
 }
 
 // GetEmployeeData handles the HTTP request to fetch employee data
@@ -36,20 +33,11 @@ func GetEmployeeData(w http.ResponseWriter, r *http.Request) {
 			e.contact_number AS employer_contact,
 			CONCAT_WS(', ', e.address_line1, e.address_line2, e.address_line3) AS employer_address,
 			sup.supervisor_id AS supervisor_id,
-			sup.first_name || ' ' || sup.last_name AS supervisor_name,
-			o.otp_code AS latest_otp_code,
-			o.expires_at
+			sup.first_name || ' ' || sup.last_name AS supervisor_name
 		FROM 
 			student s
 		LEFT JOIN employer e ON s.employer_id = e.id
-		LEFT JOIN supervisor sup ON s.supervisor_id = sup.supervisor_id
-		LEFT JOIN LATERAL (
-			SELECT otp_code, expires_at
-			FROM otps
-			WHERE otps.student_id = s.id
-			ORDER BY created_at DESC
-			LIMIT 1
-		) o ON true;
+		LEFT JOIN supervisor sup ON s.supervisor_id = sup.supervisor_id;
 	`
 
 	rows, err := database.DB.Query(query)
@@ -71,8 +59,6 @@ func GetEmployeeData(w http.ResponseWriter, r *http.Request) {
 			&res.EmployerAddress,
 			&res.SupervisorID,
 			&res.SupervisorName,
-			&res.LatestOTPCode,
-			&res.ExpiresAt,
 		); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

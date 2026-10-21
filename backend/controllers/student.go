@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"server/database"
@@ -12,7 +13,7 @@ import (
 func getStudentIDFromHeader(r *http.Request) (int, error) {
 	StudentIDHeader := r.Header.Get("student-id")
 	if StudentIDHeader == "" {
-		return 0, http.ErrMissingFile
+		return 0, errors.New("missing student-id header")
 	}
 	studentID, err := strconv.Atoi(StudentIDHeader)
 	if err != nil {

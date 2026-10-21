@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 )
 
 const (
-	sheetID = "1LmvPIp-Ixdvur80OKFQ7Dm31QB1KpjOZDAstUWLkK-o"
-	rangeA1 = "Sheet1!A1:Z100"
+	defaultSheetID = "1LmvPIp-Ixdvur80OKFQ7Dm31QB1KpjOZDAstUWLkK-o"
+	rangeA1        = "Sheet1!A1:Z100"
 )
 
 type FeedbackResponse map[string]string
@@ -17,6 +18,8 @@ type FeedbackResponse map[string]string
 type googleSheetResponse struct {
 	Values [][]string `json:"values"`
 }
+
+var sheetsClient = &http.Client{Timeout: 10 * time.Second}
 
 func getEnv(key string) string {
 	return os.Getenv(key)
@@ -29,14 +32,19 @@ func FetchManagerFeedback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sheetID := getEnv("GOOGLE_SHEET_ID")
+	if sheetID == "" {
+		sheetID = defaultSheetID
+	}
+
 	url := fmt.Sprintf(
 		"https://sheets.googleapis.com/v4/spreadsheets/%s/values/%s?key=%s",
 		sheetID, rangeA1, apiKey,
 	)
 
-	resp, err := http.Get(url)
+	resp, err := sheetsClient.Get(url)
 	if err != nil {
-		http.Error(w, "Failed to fetch Google Sheet data", http.StatusInternalServerError)
+		http.Error(w, "Failed to fetch Google Sheet data: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()

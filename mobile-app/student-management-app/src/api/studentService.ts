@@ -76,10 +76,8 @@ export const updateCheckOutTime = async (): Promise<void> => {
 
     if (data.check_out_time) {
       await AsyncStorage.setItem("check_out_time", data.check_out_time);
-
     }
   } catch (error) {
-    // console.error("Error updating check_out_time:", error);
-    // throw error;
+    console.warn("Failed to update check_out_time:", error);
   }
 };

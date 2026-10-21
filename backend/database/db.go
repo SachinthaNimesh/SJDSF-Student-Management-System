@@ -19,28 +19,38 @@ func ConnectDB() {
 		log.Println("⚠️ Could not load .env file, relying on system environment variables")
 	}
 
-	// Fetching database credentials from environment variables
-	host := os.Getenv("DB_HOST")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbname := os.Getenv("DB_NAME")
-	port := os.Getenv("DB_PORT")
-	sslrootcert := "./config/ca.pem"
+	// Fetching database credentials from environment variables or DATABASE_URL
+	databaseURL := os.Getenv("DATABASE_URL")
+	var dsn string
 
-	if host == "" || user == "" || password == "" || dbname == "" || port == "" {
-		log.Fatal("❌ Database connection environment variables are not set properly")
+	if databaseURL != "" {
+		dsn = databaseURL
+	} else {
+		host := os.Getenv("DB_HOST")
+		user := os.Getenv("DB_USER")
+		password := os.Getenv("DB_PASSWORD")
+		dbname := os.Getenv("DB_NAME")
+		port := os.Getenv("DB_PORT")
+		sslmode := os.Getenv("DB_SSLMODE")
+		if sslmode == "" {
+			sslmode = "disable"
+		}
+
+		if host == "" || user == "" || password == "" || dbname == "" || port == "" {
+			log.Fatal("❌ Database connection environment variables (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT) or DATABASE_URL are not set properly")
+		}
+
+		dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", host, user, password, dbname, port, sslmode)
+
+		sslrootcert := os.Getenv("DB_SSLROOTCERT")
+		if sslrootcert != "" {
+			if _, err := os.Stat(sslrootcert); err == nil {
+				dsn += fmt.Sprintf(" sslrootcert=%s", sslrootcert)
+			} else {
+				log.Printf("⚠️ Specified DB_SSLROOTCERT file %s not found: %v", sslrootcert, err)
+			}
+		}
 	}
-
-	// Define DSN connection string with SSL root certificate
-	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=verify-ca sslrootcert=%s",
-		host,
-		user,
-		password,
-		dbname,
-		port,
-		sslrootcert,
-	)
 
 	log.Println("ℹ️ Attempting to connect to the database...")
 

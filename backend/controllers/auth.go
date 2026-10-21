@@ -15,7 +15,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -209,7 +208,7 @@ func (s *AuthService) ValidateOTP(otpCode string) (*models.OTPValidationResponse
 	if time.Now().After(otp.ExpiresAt) {
 		log.Printf("OTP expired for code: %s", otpCode) // Improved logging
 		otp.IsUsed = true
-		_, err := s.db.Exec("UPDATE otps SET is_used = true WHERE otp_code = ?", otpCode)
+		_, err := s.db.Exec("UPDATE otps SET is_used = true WHERE otp_code = $1", otpCode)
 		if err != nil {
 			log.Printf("Error marking expired OTP as used for code %s: %v", otpCode, err) // Improved logging
 		}
@@ -221,7 +220,7 @@ func (s *AuthService) ValidateOTP(otpCode string) (*models.OTPValidationResponse
 
 	// Mark OTP as used
 	otp.IsUsed = true
-	_, err = s.db.Exec("UPDATE otps SET is_used = true WHERE otp_code = ?", otpCode)
+	_, err = s.db.Exec("UPDATE otps SET is_used = true WHERE otp_code = $1", otpCode)
 	if err != nil {
 		log.Printf("Error marking OTP as used for code %s: %v", otpCode, err) // Improved logging
 	}
@@ -240,7 +239,7 @@ func (s *AuthService) VerifyDeviceAuth(studentID int, secretCode string) (bool, 
 	var authDevice models.AuthorizedDevice
 
 	// Check if the device exists
-	err := s.db.QueryRow("SELECT * FROM authorized_devices WHERE student_id = ? AND secret_code = ?", studentID, secretCode).Scan(&authDevice.ID, &authDevice.StudentID, &authDevice.SecretCode)
+	err := s.db.QueryRow("SELECT id, student_id, secret_code FROM authorized_devices WHERE student_id = $1 AND secret_code = $2", studentID, secretCode).Scan(&authDevice.ID, &authDevice.StudentID, &authDevice.SecretCode)
 	if errors.Is(err, sql.ErrNoRows) {
 		return false, nil
 	} else if err != nil {
@@ -253,31 +252,9 @@ func (s *AuthService) VerifyDeviceAuth(studentID int, secretCode string) (bool, 
 
 // RegisterRoutes registers the routes for AuthService
 func (s *AuthService) RegisterRoutes(router *mux.Router) {
-	// CORS Setup for AuthService routes
-	corsMiddleware := handlers.CORS(
-		handlers.AllowedHeaders([]string{
-			"Content-Type",
-			"Authorization",
-			"Origin",
-			"Accept",
-			"X-Requested-With",
-			"Test-Key",
-			"testkey",
-			"student-id",
-			"otp-code",
-		}),
-		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"}),
-		handlers.AllowedOrigins([]string{"*"}),
-		handlers.AllowCredentials(),
-		handlers.ExposedHeaders([]string{"Content-Length"}),
-		handlers.MaxAge(86400),
-	)
-
-	// Apply CORS middleware to AuthService routes
 	router.HandleFunc("/generate-otp", s.HandleGenerateOTP).Methods("POST")
 	router.HandleFunc("/validate-otp", s.HandleValidateOTP).Methods("POST")
 	router.HandleFunc("/verify-device-auth", s.HandleVerifyDeviceAuth).Methods("POST")
-	router.Use(corsMiddleware)
 }
 
 // Helper function to generate a random 4-digit OTP

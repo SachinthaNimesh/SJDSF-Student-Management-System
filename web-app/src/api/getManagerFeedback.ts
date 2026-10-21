@@ -1,15 +1,15 @@
-import { API_URL } from "../config/configs";
+import apiClient from "../lib/axios";
+
 export type FeedbackResponse = {
   [key: string]: string;
 };
 
 export async function getManagerFeedback(): Promise<FeedbackResponse[]> {
-  const res = await fetch(`${API_URL}/manager-feedback`);
-  if (!res.ok) {
-    throw new Error(
-      `Failed to fetch manager feedback: ${res.status} ${res.statusText}`
-    );
+  try {
+    const res = await apiClient.get<FeedbackResponse[]>("/manager-feedback");
+    return Array.isArray(res.data) ? res.data : [];
+  } catch (error) {
+    console.error("Failed to fetch manager feedback:", error);
+    throw error;
   }
-  const json = await res.json();
-  return Array.isArray(json) ? (json as FeedbackResponse[]) : [];
 }
