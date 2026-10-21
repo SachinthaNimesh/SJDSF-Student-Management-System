@@ -62,23 +62,28 @@ export const BASE_URL = IS_LOCAL ? LOCAL_BASE_URL : CHOREO_BASE_URL;
 
 ## 🏃 Running the Application
 
-### Start Development Server
+### Start Development Server with Expo Go
 
 ```bash
-npx expo start
+# Start directly in Expo Go mode
+npm start
+# or: npx expo start --go -c
 ```
 
-Or clear cache if experiencing bundling issues:
+### If Phone & Computer Are on Different Wi-Fi (Tunnel Mode)
+If your phone is on cellular data, different Wi-Fi, or you see `java.io.IOException: failed to download remote update`:
 ```bash
-npx expo start -c
+npm run start:tunnel
+# or: npx expo start --go --tunnel
 ```
 
 ### Opening on Device:
 
-1. **Physical Phone**: Open Expo Go (or Camera app on iOS) and scan the QR code printed in your terminal.
+1. **Physical Phone**: Open the **Expo Go** app and scan the QR code printed in your terminal (make sure the QR code shows `exp://...`, not `exp+worky://...`).
 2. **iOS Simulator**: Press **`i`** in the terminal.
 3. **Android Emulator**: Press **`a`** in the terminal.
-4. **Reload**: Press **`r`** to reload the app bundle.
+4. **Switch between Expo Go and Dev Client**: Press **`s`** in the running terminal.
+5. **Reload**: Press **`r`** to reload the app bundle.
 
 ---
 

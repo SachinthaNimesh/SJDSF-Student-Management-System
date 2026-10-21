@@ -31,7 +31,9 @@
     },
     "runtimeVersion": "1.0.6",
     "updates": {
-      "url": "https://u.expo.dev/a704672c-6fca-4644-b5d2-88c9dcf0662e"
+      "url": "https://u.expo.dev/a704672c-6fca-4644-b5d2-88c9dcf0662e",
+      "enabled": false,
+      "checkAutomatically": "NEVER"
     },
     "owner": "sjdsf",
     "plugins": [
