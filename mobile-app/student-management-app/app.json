@@ -56,7 +56,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-status-bar"
     ],
     "ios": {
       "bundleIdentifier": "com.sachintha-wso2.studentmanagementapp"

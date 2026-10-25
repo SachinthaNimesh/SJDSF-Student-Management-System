@@ -24,7 +24,7 @@ type Props = {
 const ParentPin: React.FC<Props> = ({ navigation }) => {
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<any>(null);
 
   const handlePinChange = (text: string) => {
     // Only accept numeric digits, up to 4 characters

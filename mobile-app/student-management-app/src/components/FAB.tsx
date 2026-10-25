@@ -184,7 +184,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps & { navigation?: 
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
+      <StatusBar barStyle="dark-content" />
 
       {/* Backdrop */}
       <Animated.View
