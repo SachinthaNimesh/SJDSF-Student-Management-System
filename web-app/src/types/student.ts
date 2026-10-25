@@ -16,6 +16,7 @@ export interface Student {
   employer_id?: number | null;
   check_in_time: string;
   check_out_time: string;
+  parent_pin?: string;
 }
 // export interface Student {
 //     id: number;

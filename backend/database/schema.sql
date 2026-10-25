@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS student (
     home_lat DOUBLE PRECISION DEFAULT 0.0,
     employer_id INT REFERENCES employer(id) ON DELETE SET NULL,
     check_in_time VARCHAR(20),
-    check_out_time VARCHAR(20)
+    check_out_time VARCHAR(20),
+    parent_pin VARCHAR(4) DEFAULT '1234'
 );
 
 -- 4. Attendance table
@@ -51,7 +52,10 @@ CREATE TABLE IF NOT EXISTS attendance (
     check_in_date_time TIMESTAMPTZ NOT NULL,
     check_out_lat DOUBLE PRECISION,
     check_out_long DOUBLE PRECISION,
-    check_out_date_time TIMESTAMPTZ
+    check_out_date_time TIMESTAMPTZ,
+    arrived_home_lat DOUBLE PRECISION,
+    arrived_home_long DOUBLE PRECISION,
+    arrived_home_date_time TIMESTAMPTZ
 );
 
 CREATE INDEX IF NOT EXISTS idx_attendance_student_time ON attendance(student_id, check_in_date_time);
@@ -92,3 +96,25 @@ CREATE TABLE IF NOT EXISTS emergency_contact (
     phone_number VARCHAR(50) NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 9. Student Daily Feedback table
+CREATE TABLE IF NOT EXISTS student_feedback (
+    id SERIAL PRIMARY KEY,
+    student_id INT NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+    feedback_text TEXT NOT NULL,
+    submitted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_student_feedback_student ON student_feedback(student_id, submitted_at);
+
+-- 10. Student Location Tracking table (1-month retention)
+CREATE TABLE IF NOT EXISTS student_locations (
+    id BIGSERIAL PRIMARY KEY,
+    student_id INT NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
+    accuracy DOUBLE PRECISION,
+    recorded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_student_locations_student_time ON student_locations(student_id, recorded_at);

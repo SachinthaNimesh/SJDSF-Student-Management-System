@@ -10,6 +10,7 @@ export interface StudentEmployerSupervisor {
     supervisor_first_name: string | null;
     supervisor_last_name: string | null;
     supervisor_contact_number: string | null;
+    parent_pin?: string | null;
 }
 
 export async function getManagementTable(): Promise<StudentEmployerSupervisor[]> {

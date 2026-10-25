@@ -16,6 +16,7 @@ type StudentEmployerSupervisor struct {
 	SupervisorFirstName     *string `json:"supervisor_first_name"`
 	SupervisorLastName      *string `json:"supervisor_last_name"`
 	SupervisorContactNumber *string `json:"supervisor_contact_number"`
+	ParentPIN               *string `json:"parent_pin"`
 }
 
 // Handler to get the joined data
@@ -32,7 +33,8 @@ func GetManagementTable(w http.ResponseWriter, r *http.Request) {
 			e.contact_number AS employer_contact_number,
 			sup.first_name AS supervisor_first_name,
 			sup.last_name AS supervisor_last_name,
-			sup.contact_number AS supervisor_contact_number
+			sup.contact_number AS supervisor_contact_number,
+			COALESCE(s.parent_pin, '1234') AS parent_pin
 		FROM student AS s
 		LEFT JOIN employer AS e ON s.employer_id = e.id
 		LEFT JOIN supervisor AS sup ON s.supervisor_id = sup.supervisor_id
@@ -56,6 +58,7 @@ func GetManagementTable(w http.ResponseWriter, r *http.Request) {
 			&res.SupervisorFirstName,
 			&res.SupervisorLastName,
 			&res.SupervisorContactNumber,
+			&res.ParentPIN,
 		); err != nil {
 			http.Error(w, "Failed to scan data", http.StatusInternalServerError)
 			return

@@ -19,6 +19,7 @@ func GetStudentDetails(w http.ResponseWriter, r *http.Request) {
         s.check_out_time,
 		a.check_in_date_time,
 		a.check_out_date_time,
+		a.arrived_home_date_time,
         m.emotion
     FROM student s
     LEFT JOIN employer e ON s.employer_id = e.id
@@ -53,7 +54,7 @@ func GetStudentDetails(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var student models.StudentCard
-		var checkInDateTime, checkOutDateTime *time.Time
+		var checkInDateTime, checkOutDateTime, arrivedHomeDateTime *time.Time
 		var emotion *string
 
 		err := rows.Scan(
@@ -65,6 +66,7 @@ func GetStudentDetails(w http.ResponseWriter, r *http.Request) {
 			&student.CheckOutTime,
 			&checkInDateTime,
 			&checkOutDateTime,
+			&arrivedHomeDateTime,
 			&emotion,
 		)
 		if err != nil {
@@ -80,6 +82,7 @@ func GetStudentDetails(w http.ResponseWriter, r *http.Request) {
 		if checkOutDateTime != nil {
 			student.CheckOutDateTime = *checkOutDateTime
 		}
+		student.ArrivedHomeDateTime = arrivedHomeDateTime
 		if emotion != nil {
 			student.Emotion = *emotion
 		}

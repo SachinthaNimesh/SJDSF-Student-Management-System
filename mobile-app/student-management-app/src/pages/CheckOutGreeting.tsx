@@ -12,10 +12,11 @@ const CheckOutGreeting: React.FC<Props> = ({ navigation }) => {
 
   useEffect(() => {
     const messages = [
+      "Arrived home safely!",
+      "You are home safe and sound!",
       "Great job today!",
       "Enjoy your time off!",
       "Relax and recharge!",
-      "See you!",
       "Take care!",
       "Have a wonderful evening!",
       "Thanks for your hard work!",

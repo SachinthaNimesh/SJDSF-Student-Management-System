@@ -14,4 +14,7 @@ type Attendance struct {
 	CheckOutDateTime sql.NullTime    `json:"check_out_date_time"`
 	CheckOutLong     sql.NullFloat64 `json:"check_out_long"`
 	CheckOutLat      sql.NullFloat64 `json:"check_out_lat"`
+	ArrivedHomeDateTime sql.NullTime `json:"arrived_home_date_time"`
+	ArrivedHomeLong  sql.NullFloat64 `json:"arrived_home_long"`
+	ArrivedHomeLat   sql.NullFloat64 `json:"arrived_home_lat"`
 }

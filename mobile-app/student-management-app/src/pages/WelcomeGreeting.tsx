@@ -43,12 +43,9 @@ const WelcomeGreeting: React.FC<Props> = ({ navigation }) => {
       setShowAnimation(true);
       const timer2 = setTimeout(() => {
         navigation.replace("Emotions");
-        setTimeout(() => {
-          BackHandler.exitApp();
-        }, 0.1);
       }, 1000);
       return () => clearTimeout(timer2);
-    }, 3000);
+    }, 2500);
 
     return () => clearTimeout(timer1);
   }, [navigation]);

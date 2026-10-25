@@ -8,6 +8,7 @@ import WelcomeGreeting from "./src/pages/WelcomeGreeting";
 import Emotion from "./src/pages/Emotion";
 import CheckOutScreen from "./src/pages/CheckOutScreen";
 import Feedback from "./src/pages/Feedback";
+import ParentPin from "./src/pages/ParentPin";
 import CheckOutGreeting from "./src/pages/CheckOutGreeting";
 import PostEmotion from "./src/pages/PostEmotion";
 
@@ -55,6 +56,13 @@ const NavigationStack = ({ initialRoute }: { initialRoute: string }) => (
       {(props) => (
         <Layout>
           <Feedback {...props} />
+        </Layout>
+      )}
+    </Stack.Screen>
+    <Stack.Screen name="ParentPin">
+      {(props) => (
+        <Layout>
+          <ParentPin {...props} />
         </Layout>
       )}
     </Stack.Screen>

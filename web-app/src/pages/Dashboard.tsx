@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { X, Clock, Users, Smile, Frown, Meh, Search } from "lucide-react";
+import { X, Clock, Users, Smile, Frown, Meh, Search, Home } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCardService } from "../api/getCard";
 
@@ -42,57 +42,73 @@ const Dashboard = () => {
     (emp) => emp.emotion === "happy"
   ).length;
 
-  // Helper to determine checked in/out status for today
+  // Helper to determine checked in/out/arrived home status for today
   function getStatusForToday(employee) {
     const today = new Date();
     const todayStr = today.toISOString().slice(0, 10); // "YYYY-MM-DD"
     const checkedInRaw = employee.check_in_date_time;
     const checkedOutRaw = employee.check_out_date_time;
+    const arrivedHomeRaw = employee.arrived_home_date_time;
 
     // Special "zero" timestamp string (can appear as with or without T, so check both)
     const ZERO_TIMESTAMP = "0001-01-01";
     const isZeroTimestamp = (val) =>
       typeof val === "string" && val.startsWith(ZERO_TIMESTAMP);
 
-    // Parse check-in/check-out dates
+    // Parse dates
     let checkedInDate = checkedInRaw ? new Date(checkedInRaw) : null;
     let checkedOutDate = checkedOutRaw ? new Date(checkedOutRaw) : null;
+    let arrivedHomeDate = arrivedHomeRaw ? new Date(arrivedHomeRaw) : null;
 
-    // Check if check-in/check-out is today
+    // Check if dates are today
     const isCheckedInToday =
       checkedInDate && checkedInDate.toISOString().slice(0, 10) === todayStr;
     const isCheckedOutToday =
       checkedOutDate && checkedOutDate.toISOString().slice(0, 10) === todayStr;
+    const isArrivedHomeToday =
+      arrivedHomeDate && arrivedHomeDate.toISOString().slice(0, 10) === todayStr;
 
-    // 1. If there is a checked out record for today and it is not the zero timestamp, show "Out"
-    if (checkedOutRaw && !isZeroTimestamp(checkedOutRaw) && isCheckedOutToday) {
+    // 1. If marked arrived home today, show "Arrived Home"
+    if (arrivedHomeRaw && !isZeroTimestamp(arrivedHomeRaw) && isArrivedHomeToday) {
       return {
-        status: "Out",
-        statusColor: "bg-red-100 text-red-700",
+        status: "Arrived Home",
+        statusColor: "bg-purple-100 text-purple-700",
       };
     }
 
-    // 2. If checked out is zero timestamp or not recorded, and there is a valid checked in for today, mark "In"
+    // 2. If checked out today, show "Checked Out"
+    if (checkedOutRaw && !isZeroTimestamp(checkedOutRaw) && isCheckedOutToday) {
+      return {
+        status: "Checked Out",
+        statusColor: "bg-amber-100 text-amber-700",
+      };
+    }
+
+    // 3. If checked in today, show "Checked In"
     if (
       isCheckedInToday &&
       (!checkedOutRaw || isZeroTimestamp(checkedOutRaw))
     ) {
       return {
-        status: "In",
+        status: "Checked In",
         statusColor: "bg-green-100 text-green-700",
       };
     }
 
-    // 3. Otherwise, mark "Out"
+    // 4. Otherwise, mark "Not In"
     return {
-      status: "Out",
+      status: "Not In",
       statusColor: "bg-red-100 text-red-700",
     };
   }
 
-  // Calculate checked in employees using the same logic as getStatusForToday
+  // Calculate checked in & arrived home employees using getStatusForToday
   const checkedInEmployees = safeEmployees.filter(
-    (emp) => getStatusForToday(emp).status === "In"
+    (emp) => getStatusForToday(emp).status === "Checked In"
+  ).length;
+
+  const arrivedHomeEmployees = safeEmployees.filter(
+    (emp) => getStatusForToday(emp).status === "Arrived Home"
   ).length;
 
   // Emotion counts
@@ -198,7 +214,7 @@ const Dashboard = () => {
               </div>
             </div>
             {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <div className="bg-gradient-to-br from-white to-blue-50 rounded-xl p-6 shadow-sm border border-blue-100/50">
                 <div className="flex items-center justify-between">
                   <div>
@@ -226,6 +242,21 @@ const Dashboard = () => {
                   </div>
                   <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-lg">
                     <Clock className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-white to-purple-50 rounded-xl p-6 shadow-sm border border-purple-100/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">
+                      Arrived Home
+                    </p>
+                    <p className="text-2xl font-semibold text-purple-900 mt-1">
+                      {arrivedHomeEmployees}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg">
+                    <Home className="w-6 h-6 text-white" />
                   </div>
                 </div>
               </div>

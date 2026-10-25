@@ -7,11 +7,12 @@ type StudentCard struct {
 	FirstName        string    `json:"first_name"`
 	LastName         string    `json:"last_name"`
 	EmployerName     *string   `json:"employer_name"` // Updated to pointer to handle NULL
-	CheckInDateTime  time.Time `json:"check_in_date_time"`
-	CheckOutDateTime time.Time `json:"check_out_date_time"`
-	Emotion          string    `json:"emotion"`
-	CheckInTime      string    `json:"check_in_time"`
-	CheckOutTime     string    `json:"check_out_time"`
+	CheckInDateTime       time.Time  `json:"check_in_date_time"`
+	CheckOutDateTime      time.Time  `json:"check_out_date_time"`
+	ArrivedHomeDateTime   *time.Time `json:"arrived_home_date_time"`
+	Emotion               string     `json:"emotion"`
+	CheckInTime           string     `json:"check_in_time"`
+	CheckOutTime          string     `json:"check_out_time"`
 }
 
 func (StudentCard) TableName() string {

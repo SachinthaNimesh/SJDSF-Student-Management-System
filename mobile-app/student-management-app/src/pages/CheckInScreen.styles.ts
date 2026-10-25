@@ -66,9 +66,15 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "white",
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
     textTransform: "uppercase",
+  },
+  buttonSubText: {
+    color: "rgba(255, 255, 255, 0.9)",
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: 4,
   },
 
   noInternetCard: {

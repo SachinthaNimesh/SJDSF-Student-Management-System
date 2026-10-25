@@ -24,11 +24,15 @@ import {
   StudentInfo,
   Mood,
 } from "../api/getEmployeeSummary";
+import apiClient from "../lib/axios";
+import { appConfig } from "../config/configs";
 
 const StudentDetail = () => {
   const { id } = useParams();
   const [profile, setProfile] = useState<TraineeProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dailyFeedbacks, setDailyFeedbacks] = useState<any[]>([]);
+  const [locationLogs, setLocationLogs] = useState<any[]>([]);
 
   // Prepare attendance data for table
   const attendanceData =
@@ -112,6 +116,22 @@ const StudentDetail = () => {
         console.error("Error fetching data:", error);
       })
       .finally(() => setLoading(false));
+
+    // Fetch daily feedbacks
+    apiClient
+      .get(`/student-feedbacks?student_id=${id}`, {
+        headers: { "api-key": appConfig.VITE_API_KEY },
+      })
+      .then((res) => setDailyFeedbacks(Array.isArray(res.data) ? res.data : []))
+      .catch((err) => console.error("Error fetching feedbacks:", err));
+
+    // Fetch location history (30 days)
+    apiClient
+      .get(`/student/${id}/locations`, {
+        headers: { "api-key": appConfig.VITE_API_KEY },
+      })
+      .then((res) => setLocationLogs(Array.isArray(res.data) ? res.data : []))
+      .catch((err) => console.error("Error fetching locations:", err));
   }, [id]);
 
   const feedbacks =
@@ -159,12 +179,15 @@ const StudentDetail = () => {
                   Employer:{" "}
                   <span className="font-medium">{employee.employer_name}</span>
                 </p>
-                <div className="flex gap-4 mt-2">
+                <div className="flex flex-wrap gap-3 mt-2">
                   <span className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 text-xs font-semibold shadow">
                     Guardian: {employee.guardian_contact_no}
                   </span>
                   <span className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-indigo-100 to-indigo-200 text-indigo-700 text-xs font-semibold shadow">
                     Student: {employee.student_contact_no}
+                  </span>
+                  <span className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 text-xs font-semibold shadow font-mono">
+                    Parent PIN: {employee.parent_pin || "1234"}
                   </span>
                 </div>
               </div>
@@ -278,29 +301,96 @@ const StudentDetail = () => {
                 </div>
               </Card>
 
-              {/* Feedbacks */}
+              {/* Feedbacks (Remarks & Daily Check-Out Feedbacks) */}
               <Card className="bg-gradient-to-br from-white to-green-50 p-6 rounded-2xl shadow-md border border-green-100/60 transition-transform hover:scale-[1.02]">
                 <h3 className="text-lg font-bold mb-4 text-green-700">
-                  Feedbacks
+                  Daily Check-Out Feedbacks & Remarks
                 </h3>
-                <div className="space-y-4">
-                  {feedbacks.length === 0 && (
+                <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
+                  {feedbacks.length === 0 && dailyFeedbacks.length === 0 && (
                     <div className="text-gray-400 text-sm">
                       No feedbacks yet.
                     </div>
                   )}
                   {feedbacks.map((feedback, index) => (
                     <div
-                      key={index}
+                      key={`remark-${index}`}
                       className="p-3 bg-green-50/60 rounded-lg shadow-sm border border-green-100"
                     >
-                      <p className="text-xs text-gray-500 mb-1"></p>
+                      <span className="text-xs font-semibold text-green-600 block mb-1">General Remark</span>
                       <p className="text-sm text-green-800">
                         {feedback.content}
                       </p>
                     </div>
                   ))}
+                  {dailyFeedbacks.map((df) => (
+                    <div
+                      key={`feedback-${df.id}`}
+                      className="p-3 bg-white/80 rounded-lg shadow-sm border border-green-200"
+                    >
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs font-semibold text-green-700">Student Feedback</span>
+                        <span className="text-xs text-gray-400">
+                          {df.submitted_at ? new Date(df.submitted_at).toLocaleString() : ""}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-800">{df.feedback_text}</p>
+                    </div>
+                  ))}
                 </div>
+              </Card>
+
+              {/* Location Tracking History (30-Day Retention) */}
+              <Card className="bg-gradient-to-br from-white to-indigo-50 p-6 rounded-2xl shadow-md border border-indigo-100/60 transition-transform hover:scale-[1.02] md:col-span-2">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold text-indigo-700">
+                    Location History (5-Minute Tracking Logs)
+                  </h3>
+                  <span className="text-xs text-gray-500">
+                    {locationLogs.length} pings recorded (retained for 30 days)
+                  </span>
+                </div>
+                {locationLogs.length === 0 ? (
+                  <p className="text-sm text-gray-400">No location updates recorded in the last 30 days.</p>
+                ) : (
+                  <div className="max-h-60 overflow-y-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-xs">RECORDED AT</TableHead>
+                          <TableHead className="text-xs">LATITUDE</TableHead>
+                          <TableHead className="text-xs">LONGITUDE</TableHead>
+                          <TableHead className="text-xs">ACCURACY</TableHead>
+                          <TableHead className="text-xs">MAP VIEW</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {locationLogs.slice(0, 20).map((loc) => (
+                          <TableRow key={loc.id} className="hover:bg-indigo-50/50">
+                            <TableCell className="text-xs text-gray-600">
+                              {new Date(loc.recorded_at).toLocaleString()}
+                            </TableCell>
+                            <TableCell className="text-xs font-mono">{loc.latitude.toFixed(5)}</TableCell>
+                            <TableCell className="text-xs font-mono">{loc.longitude.toFixed(5)}</TableCell>
+                            <TableCell className="text-xs text-gray-500">
+                              {loc.accuracy ? `±${Math.round(loc.accuracy)}m` : "N/A"}
+                            </TableCell>
+                            <TableCell>
+                              <a
+                                href={`https://www.google.com/maps/search/?api=1&query=${loc.latitude},${loc.longitude}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-indigo-600 hover:text-indigo-800 underline font-medium"
+                              >
+                                View Map
+                              </a>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </Card>
             </div>
           </div>

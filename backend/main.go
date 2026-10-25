@@ -59,6 +59,9 @@ func main() {
 	// Register API routes
 	routes.RegisterStudentRoutes(router)
 
+	// Start 30-day location cleanup worker
+	controllers.StartLocationCleanupWorker()
+
 	// Start the server with CORS handler wrapping the router
 	log.Println("Server started on port", port)
 	log.Fatal(http.ListenAndServe(":"+port, corsMiddleware(router)))

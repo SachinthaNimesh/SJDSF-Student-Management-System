@@ -16,7 +16,7 @@ func ConnectDB() {
 	// Load environment variables from .env file
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("⚠️ Could not load .env file, relying on system environment variables")
+		_ = godotenv.Load("../.env")
 	}
 
 	// Fetching database credentials from environment variables or DATABASE_URL
@@ -69,6 +69,49 @@ func ConnectDB() {
 
 	DB = db
 	log.Println("✅ Database connected successfully!")
+
+	RunMigrations()
+}
+
+// RunMigrations ensures new columns and tables exist without breaking existing data
+func RunMigrations() {
+	if DB == nil {
+		return
+	}
+
+	migrations := []string{
+		// 1. Add parent_pin to student
+		`ALTER TABLE student ADD COLUMN IF NOT EXISTS parent_pin VARCHAR(4) DEFAULT '1234'`,
+		// 2. Add arrived home columns to attendance
+		`ALTER TABLE attendance ADD COLUMN IF NOT EXISTS arrived_home_date_time TIMESTAMPTZ`,
+		`ALTER TABLE attendance ADD COLUMN IF NOT EXISTS arrived_home_lat DOUBLE PRECISION`,
+		`ALTER TABLE attendance ADD COLUMN IF NOT EXISTS arrived_home_long DOUBLE PRECISION`,
+		// 3. Create student_feedback table
+		`CREATE TABLE IF NOT EXISTS student_feedback (
+			id SERIAL PRIMARY KEY,
+			student_id INT NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+			feedback_text TEXT NOT NULL,
+			submitted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_student_feedback_student ON student_feedback(student_id, submitted_at)`,
+		// 4. Create student_locations table for 5-minute tracking (30-day retention)
+		`CREATE TABLE IF NOT EXISTS student_locations (
+			id BIGSERIAL PRIMARY KEY,
+			student_id INT NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+			latitude DOUBLE PRECISION NOT NULL,
+			longitude DOUBLE PRECISION NOT NULL,
+			accuracy DOUBLE PRECISION,
+			recorded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_student_locations_student_time ON student_locations(student_id, recorded_at)`,
+	}
+
+	for _, stmt := range migrations {
+		if _, err := DB.Exec(stmt); err != nil {
+			log.Printf("⚠️ Migration warning: %v (statement: %s)", err, stmt)
+		}
+	}
+	log.Println("✅ Database migrations applied successfully!")
 }
 
 // Initialize sets up the database connection

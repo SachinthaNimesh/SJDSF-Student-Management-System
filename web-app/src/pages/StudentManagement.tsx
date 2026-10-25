@@ -57,6 +57,7 @@ const StudentManagement = () => {
   const [employerId, setEmployerId] = useState<string | undefined>(undefined);
   const [checkInTime, setCheckInTime] = useState(""); // HH:MM
   const [checkOutTime, setCheckOutTime] = useState(""); // HH:MM
+  const [parentPin, setParentPin] = useState("1234"); // 4-digit PIN for parent confirmation
 
   // State for API data
   const [managementData, setManagementData] = useState<
@@ -162,6 +163,7 @@ const StudentManagement = () => {
       employer_id: employerId ? Number(employerId) : null,
       check_in_time: formatTime(checkInTime), // append :00 if present
       check_out_time: formatTime(checkOutTime), // append :00 if present
+      parent_pin: parentPin || "1234",
       address_line1: "",
       address_line2: "",
       city: "",
@@ -212,6 +214,7 @@ const StudentManagement = () => {
     setEmployerId(undefined);
     setCheckInTime("");
     setCheckOutTime("");
+    setParentPin("1234");
     setIsFormSubmitted(false);
   };
 
@@ -290,6 +293,7 @@ const StudentManagement = () => {
           ? fullStudentData.check_out_time.substring(0, 5)
           : ""
       );
+      setParentPin(fullStudentData.parent_pin || "1234");
 
       setIsAddDialogOpen(true);
     } catch (error) {
@@ -420,6 +424,11 @@ const StudentManagement = () => {
       errors.checkOutTime = "Check-out time is required";
     }
 
+    // Parent PIN must be exactly 4 digits
+    if (parentPin && !/^\d{4}$/.test(parentPin)) {
+      errors.parentPin = "Parent PIN must be exactly 4 numeric digits";
+    }
+
     return errors;
   }
 
@@ -510,6 +519,9 @@ const StudentManagement = () => {
                     <TableHead className="font-semibold text-gray-700">
                       SUPERVISOR CONTACT
                     </TableHead>
+                    <TableHead className="font-semibold text-gray-700">
+                      PARENT PIN
+                    </TableHead>
                     <TableHead className="w-24 font-semibold text-gray-700">
                       ACTION
                     </TableHead>
@@ -518,13 +530,13 @@ const StudentManagement = () => {
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center">
+                      <TableCell colSpan={8} className="text-center">
                         Loading...
                       </TableCell>
                     </TableRow>
                   ) : filteredSortedManagementData.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center">
+                      <TableCell colSpan={8} className="text-center">
                         No students found.
                       </TableCell>
                     </TableRow>
@@ -553,6 +565,11 @@ const StudentManagement = () => {
                         </TableCell>
                         <TableCell className="text-gray-700">
                           {item.supervisor_contact_number || "-"}
+                        </TableCell>
+                        <TableCell className="text-gray-700">
+                          <span className="font-mono bg-indigo-50 border border-indigo-200 text-indigo-700 px-2 py-0.5 rounded text-xs font-semibold">
+                            {item.parent_pin || "1234"}
+                          </span>
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
@@ -859,6 +876,33 @@ const StudentManagement = () => {
                     </span>
                   )}
                 </div>
+              </div>
+
+              {/* Parent PIN for Arrived Home confirmation */}
+              <div className="bg-white/50 p-4 rounded-xl border border-gray-100">
+                <Label
+                  htmlFor="parentPin"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Parent 4-Digit PIN <span className="text-red-600">*</span>
+                </Label>
+                <Input
+                  id="parentPin"
+                  type="text"
+                  maxLength={4}
+                  placeholder="e.g. 1234"
+                  value={parentPin}
+                  onChange={(e) => setParentPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                  className="mt-1.5 bg-white/80 font-mono tracking-widest text-center max-w-[150px]"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Required for parents/employees to confirm student arrived home safely.
+                </p>
+                {formErrors.parentPin && (
+                  <span className="text-red-600 text-xs">
+                    {formErrors.parentPin}
+                  </span>
+                )}
               </div>
 
               {/* Remarks */}

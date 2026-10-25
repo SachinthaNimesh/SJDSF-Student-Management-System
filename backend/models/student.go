@@ -22,4 +22,5 @@ type Student struct {
 	EmployerID            *uint     `json:"employer_id"`
 	CheckInTime           string    `json:"check_in_time"`
 	CheckOutTime          string    `json:"check_out_time"`
+	ParentPIN             string    `json:"parent_pin"`
 }

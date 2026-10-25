@@ -1,145 +1,94 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Animated, ActivityIndicator } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { postMood, MoodType } from '../api/moodService';
-import NetInfo from '@react-native-community/netinfo';
+import { postStudentFeedback } from '../api/attendanceService';
 import styles from './Feedback.styles';
-import OfflineNotice from '../components/OfflineNotice';
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
 };
 
-const moodEmojis = {
-  happy: '😊',
-  neutral: '😐',
-  sad: '😢',
-};
-
 const Feedback: React.FC<Props> = ({ navigation }) => {
+  const [feedbackText, setFeedbackText] = useState('');
   const [loading, setLoading] = useState(false);
-  const [activeMood, setActiveMood] = useState<MoodType | null>(null);
-  const [showNoInternet, setShowNoInternet] = useState(false);
 
-  // Add refs for button scale animations
-  const buttonScales = {
-    happy: useRef(new Animated.Value(1)).current,
-    neutral: useRef(new Animated.Value(1)).current,
-    sad: useRef(new Animated.Value(1)).current,
-  };
-
-  useEffect(() => {
-    if (!showNoInternet) return;
-    const unsubscribe = NetInfo.addEventListener(state => {
-      if (state.isConnected) {
-        setShowNoInternet(false);
-        setActiveMood(null);
-        setLoading(false);
-      }
-    });
-    return () => unsubscribe();
-  }, [showNoInternet]);
-
-  const handleMoodPressIn = (mood: MoodType) => {
-    Animated.spring(buttonScales[mood], {
-      toValue: 0.92,
-      useNativeDriver: true,
-      speed: 50,
-      bounciness: 10,
-    }).start();
-  };
-
-  const handleMoodPressOut = (mood: MoodType) => {
-    Animated.spring(buttonScales[mood], {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 50,
-      bounciness: 10,
-    }).start();
-  };
-
-  const handleMoodPress = async (emotion: MoodType) => {
-    setActiveMood(emotion);
-    setLoading(true);
+  const handleSubmit = async () => {
+    if (loading) return;
     try {
-      await postMood(emotion, 'checkout');
-      setTimeout(() => {
-        setActiveMood(null);
-        navigation.navigate('CheckOutGreeting');
-      }, 1000);
-    } catch (error: any) {
-      if (
-        typeof error?.message === 'string' &&
-        (
-          error.message.toLowerCase().includes('network') ||
-          error.message.toLowerCase().includes('internet') ||
-          error.message.toLowerCase().includes('connection') ||
-          error.message.toLowerCase().includes('failed to fetch')
-        )
-      ) {
-        setShowNoInternet(true);
-      } else {
-        console.error('Error posting mood:', error);
-        alert(error instanceof Error ? error.message : 'An error occurred while saving your mood.');
-        setActiveMood(null);
+      setLoading(true);
+      if (feedbackText.trim() !== '') {
+        await postStudentFeedback(feedbackText.trim());
       }
+      navigation.replace('ParentPin');
+    } catch (error) {
+      console.warn('Could not post feedback immediately (queued if offline):', error);
+      // Navigate to ParentPin even if offline because apiQueue queued the request
+      navigation.replace('ParentPin');
     } finally {
       setLoading(false);
     }
   };
 
-  if (showNoInternet) {
-    return (
-      <OfflineNotice />
-    );
-  }
+  const handleSkip = () => {
+    navigation.replace('ParentPin');
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.moodCard}>
-        <Text style={styles.title}>Today?</Text>
-        <View style={styles.moodButtons}>
-          {(['happy', 'neutral', 'sad'] as const).map((mood) => (
-            <Animated.View
-              key={mood}
-              style={{ transform: [{ scale: buttonScales[mood] }], width: '100%' }}
-            >
-              <TouchableOpacity
-                style={[
-                  styles.moodButton,
-                  activeMood === mood && loading ? styles.selectedMood : null,
-                ]}
-                onPressIn={() => handleMoodPressIn(mood)}
-                onPressOut={() => handleMoodPressOut(mood)}
-                onPress={() => handleMoodPress(mood)}
-                disabled={loading || activeMood !== null}
-                activeOpacity={0.8}
-              >
-                <View
-                  style={[
-                    styles.moodEmoji,
-                    mood === 'happy'
-                      ? styles.happy
-                      : mood === 'neutral'
-                      ? styles.neutral
-                      : styles.sad,
-                  ]}
-                >
-                  <Text style={styles.emojiText}>{moodEmojis[mood]}</Text>
-                </View>
-                <Text style={styles.moodText}>
-                  {mood.charAt(0).toUpperCase() + mood.slice(1)}
-                </Text>
-                <View style={styles.flexGrow} />
-                {activeMood === mood && loading && (
-                  <ActivityIndicator size="small" color="#8B7ED8" style={{ marginLeft: 10 }} />
-                )}
-              </TouchableOpacity>
-            </Animated.View>
-          ))}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Feedback</Text>
+          <Text style={styles.subtitle}>
+            How was work today? Leave any notes or comments below.
+          </Text>
+
+          <TextInput
+            style={styles.textArea}
+            placeholder="Type your feedback here..."
+            placeholderTextColor="#a0aec0"
+            multiline
+            numberOfLines={5}
+            value={feedbackText}
+            onChangeText={setFeedbackText}
+            editable={!loading}
+          />
+
+          <TouchableOpacity
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handleSubmit}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            {loading ? (
+              <ActivityIndicator color="#ffffff" />
+            ) : (
+              <Text style={styles.buttonText}>Submit & Continue</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.skipButton}
+            onPress={handleSkip}
+            disabled={loading}
+          >
+            <Text style={styles.skipButtonText}>Skip</Text>
+          </TouchableOpacity>
         </View>
-      </View>
-    </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

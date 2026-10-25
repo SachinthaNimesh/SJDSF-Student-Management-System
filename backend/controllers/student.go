@@ -32,7 +32,7 @@ func getStudentIDFromHeader(r *http.Request) (int, error) {
 // @Router /students [get]
 func GetStudents(w http.ResponseWriter, r *http.Request) {
 	var students []models.Student
-	rows, err := database.DB.Query("SELECT id, first_name, last_name, dob, gender, address_line1, address_line2, city, contact_number, contact_number_guardian, supervisor_id, remarks, home_long, home_lat, employer_id, check_in_time, check_out_time FROM student")
+	rows, err := database.DB.Query("SELECT id, first_name, last_name, dob, gender, address_line1, address_line2, city, contact_number, contact_number_guardian, supervisor_id, remarks, home_long, home_lat, employer_id, check_in_time, check_out_time, COALESCE(parent_pin, '1234') FROM student")
 	if err != nil {
 		log.Printf("Error fetching students: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -41,7 +41,7 @@ func GetStudents(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 	for rows.Next() {
 		var s models.Student
-		if err := rows.Scan(&s.ID, &s.FirstName, &s.LastName, &s.DOB, &s.Gender, &s.AddressLine1, &s.AddressLine2, &s.City, &s.ContactNumber, &s.ContactNumberGuardian, &s.SupervisorID, &s.Remarks, &s.HomeLong, &s.HomeLat, &s.EmployerID, &s.CheckInTime, &s.CheckOutTime); err != nil {
+		if err := rows.Scan(&s.ID, &s.FirstName, &s.LastName, &s.DOB, &s.Gender, &s.AddressLine1, &s.AddressLine2, &s.City, &s.ContactNumber, &s.ContactNumberGuardian, &s.SupervisorID, &s.Remarks, &s.HomeLong, &s.HomeLat, &s.EmployerID, &s.CheckInTime, &s.CheckOutTime, &s.ParentPIN); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -70,7 +70,7 @@ func GetStudent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var s models.Student
-	err = database.DB.QueryRow("SELECT id, first_name, last_name, dob, gender, address_line1, address_line2, city, contact_number, contact_number_guardian, supervisor_id, remarks, home_long, home_lat, employer_id, check_in_time, check_out_time FROM student WHERE id = $1", studentID).Scan(&s.ID, &s.FirstName, &s.LastName, &s.DOB, &s.Gender, &s.AddressLine1, &s.AddressLine2, &s.City, &s.ContactNumber, &s.ContactNumberGuardian, &s.SupervisorID, &s.Remarks, &s.HomeLong, &s.HomeLat, &s.EmployerID, &s.CheckInTime, &s.CheckOutTime)
+	err = database.DB.QueryRow("SELECT id, first_name, last_name, dob, gender, address_line1, address_line2, city, contact_number, contact_number_guardian, supervisor_id, remarks, home_long, home_lat, employer_id, check_in_time, check_out_time, COALESCE(parent_pin, '1234') FROM student WHERE id = $1", studentID).Scan(&s.ID, &s.FirstName, &s.LastName, &s.DOB, &s.Gender, &s.AddressLine1, &s.AddressLine2, &s.City, &s.ContactNumber, &s.ContactNumberGuardian, &s.SupervisorID, &s.Remarks, &s.HomeLong, &s.HomeLat, &s.EmployerID, &s.CheckInTime, &s.CheckOutTime, &s.ParentPIN)
 	if err != nil {
 		log.Printf("Error fetching student with ID %d: %v", studentID, err)
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -98,9 +98,13 @@ func CreateStudent(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	query := `INSERT INTO student (first_name, last_name, dob, gender, address_line1, address_line2, city, contact_number, contact_number_guardian, supervisor_id, remarks, home_long, home_lat, employer_id, check_in_time, check_out_time) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id`
-	err := database.DB.QueryRow(query, s.FirstName, s.LastName, s.DOB, s.Gender, s.AddressLine1, s.AddressLine2, s.City, s.ContactNumber, s.ContactNumberGuardian, s.SupervisorID, s.Remarks, s.HomeLong, s.HomeLat, s.EmployerID, s.CheckInTime, s.CheckOutTime).Scan(&s.ID)
+	if s.ParentPIN == "" {
+		s.ParentPIN = "1234"
+	}
+	query := `INSERT INTO student (first_name, last_name, dob, gender, address_line1, address_line2, city, contact_number, contact_number_guardian, supervisor_id, remarks, home_long, home_lat, employer_id, check_in_time, check_out_time, parent_pin) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING id`
+	err := database.DB.QueryRow(query, s.FirstName, s.LastName, s.DOB, s.Gender, s.AddressLine1, s.AddressLine2, s.City, s.ContactNumber, s.ContactNumberGuardian, s.SupervisorID, s.Remarks, s.HomeLong, s.HomeLat, s.EmployerID, s.CheckInTime, s.CheckOutTime, s.ParentPIN).Scan(&s.ID)
 	if err != nil {
+		log.Printf("Failed to create student: %v", err)
 		http.Error(w, "Failed to create student", http.StatusInternalServerError)
 		return
 	}
@@ -138,9 +142,13 @@ func UpdateStudent(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	query := `UPDATE student SET first_name=$1, last_name=$2, dob=$3, gender=$4, address_line1=$5, address_line2=$6, city=$7, contact_number=$8, contact_number_guardian=$9, supervisor_id=$10, remarks=$11, home_long=$12, home_lat=$13, employer_id=$14, check_in_time=$15, check_out_time=$16 WHERE id=$17`
-	_, err = database.DB.Exec(query, input.FirstName, input.LastName, input.DOB, input.Gender, input.AddressLine1, input.AddressLine2, input.City, input.ContactNumber, input.ContactNumberGuardian, input.SupervisorID, input.Remarks, input.HomeLong, input.HomeLat, input.EmployerID, input.CheckInTime, input.CheckOutTime, id)
+	if input.ParentPIN == "" {
+		input.ParentPIN = "1234"
+	}
+	query := `UPDATE student SET first_name=$1, last_name=$2, dob=$3, gender=$4, address_line1=$5, address_line2=$6, city=$7, contact_number=$8, contact_number_guardian=$9, supervisor_id=$10, remarks=$11, home_long=$12, home_lat=$13, employer_id=$14, check_in_time=$15, check_out_time=$16, parent_pin=$17 WHERE id=$18`
+	_, err = database.DB.Exec(query, input.FirstName, input.LastName, input.DOB, input.Gender, input.AddressLine1, input.AddressLine2, input.City, input.ContactNumber, input.ContactNumberGuardian, input.SupervisorID, input.Remarks, input.HomeLong, input.HomeLat, input.EmployerID, input.CheckInTime, input.CheckOutTime, input.ParentPIN, id)
 	if err != nil {
+		log.Printf("Failed to update student: %v", err)
 		http.Error(w, "Failed to update student", http.StatusInternalServerError)
 		return
 	}

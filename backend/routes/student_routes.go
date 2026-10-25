@@ -58,4 +58,18 @@ func RegisterStudentRoutes(router *mux.Router) {
 	// Emergency contact routes
 	router.HandleFunc("/get-emergency-contact", controllers.GetEmergencyContact).Methods("GET")
 	router.HandleFunc("/update-emergency-contact", controllers.UpdateEmergencyContact).Methods("POST")
+
+	// Parent PIN and Arrived Home routes
+	router.HandleFunc("/verify-parent-pin", controllers.VerifyParentPin).Methods("POST")
+	router.HandleFunc("/arrived-home", controllers.PostArrivedHome).Methods("POST")
+	router.HandleFunc("/attendance/today", controllers.GetTodayAttendance).Methods("GET")
+
+	// Student Daily Feedback routes
+	router.HandleFunc("/feedback", controllers.PostStudentFeedback).Methods("POST")
+	router.HandleFunc("/student-feedbacks", controllers.GetStudentFeedbacks).Methods("GET")
+
+	// 5-minute Location Tracking routes (30-day retention)
+	router.HandleFunc("/location-track", controllers.PostLocation).Methods("POST")
+	router.HandleFunc("/student/{id}/locations", controllers.GetStudentLocations).Methods("GET")
+	router.HandleFunc("/student-locations", controllers.GetStudentLocations).Methods("GET")
 }

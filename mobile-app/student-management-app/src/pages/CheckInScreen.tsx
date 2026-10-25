@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import * as Haptics from "expo-haptics";
 import { postCheckIn } from "../api/attendanceService";
 import NetInfo from "@react-native-community/netinfo";
 import styles from "./CheckInScreen.styles"; 
@@ -78,25 +79,19 @@ const CheckInScreen: React.FC<Props> = ({ navigation }) => {
   const handleCheckIn = useCallback(async () => {
     if (loading) return; // Prevent multiple check-ins
     try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
       setLoading(true);
       setError(null);
 
       const { latitude, longitude } = await getCurrentLocationOnce();
 
-      console.log(
-        "latitude#:",
-        latitude,
-        "longitude#:",
-        longitude,
-        "loading#:"
-      );
-
       if (latitude == null || longitude == null) {
         setLoading(false);
-        setError("Coordinates N/A. Please try again.");
+        setError("We couldn't find your location. Please ensure location services are turned on, or ask your supervisor for help.");
         return;
       }
       await postCheckIn(latitude, longitude);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       navigation.replace("WelcomeGreeting");
     } catch (error: any) {
       // Show popup if network/connection error
@@ -111,7 +106,9 @@ const CheckInScreen: React.FC<Props> = ({ navigation }) => {
       } else {
         console.error("An error occurred during check-in:", error);
         setError(
-          error instanceof Error ? error.message : "Error check-in. Try again."
+          error instanceof Error
+            ? error.message
+            : "Could not complete check-in. Please try again or ask your supervisor."
         );
       }
     } finally {
@@ -153,9 +150,17 @@ const CheckInScreen: React.FC<Props> = ({ navigation }) => {
           onPress={handleCheckIn}
           disabled={loading}
           accessibilityRole="button"
-          accessibilityLabel="Check In"
+          accessibilityLabel="I'm here, start work"
+          activeOpacity={0.85}
         >
-          {loading ? <Loader /> : <Text style={styles.buttonText}>IN</Text>}
+          {loading ? (
+            <Loader />
+          ) : (
+            <View style={{ alignItems: "center" }}>
+              <Text style={styles.buttonText}>🟢 I'M HERE</Text>
+              <Text style={styles.buttonSubText}>Tap to Start Work</Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </View>
