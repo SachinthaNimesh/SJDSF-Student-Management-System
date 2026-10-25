@@ -130,38 +130,48 @@ const CheckInScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.title} accessibilityRole="header">
-          Check In
-        </Text>
-        <View style={styles.locationInfo}>
-          <View style={styles.infoRow}>
-            <Text style={styles.icon}>🕐</Text>
-            <Text style={styles.infoText}>
-              {currentDateTime.time} {currentDateTime.period}
-            </Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.icon}>📅</Text>
-            <Text style={styles.infoText}>{currentDateTime.fullDate}</Text>
-          </View>
+        <View style={styles.greetingHeader}>
+          <Text style={styles.greetingEmoji}>☀️</Text>
+          <Text style={styles.greetingText} accessibilityRole="header">
+            Good Morning!
+          </Text>
         </View>
+        <Text style={styles.subGreetingText}>
+          Ready to begin your work day?
+        </Text>
+
+        <View style={styles.timeCard}>
+          <Text style={styles.timeText}>
+            {currentDateTime.time} <Text style={{ fontSize: 24 }}>{currentDateTime.period}</Text>
+          </Text>
+          <Text style={styles.dateText}>
+            📅 {currentDateTime.fullDate}
+          </Text>
+        </View>
+
         <TouchableOpacity
           style={[styles.checkinButton, loading && styles.buttonDisabled]}
           onPress={handleCheckIn}
           disabled={loading}
           accessibilityRole="button"
           accessibilityLabel="I'm here, start work"
-          activeOpacity={0.85}
+          activeOpacity={0.82}
         >
           {loading ? (
             <Loader />
           ) : (
-            <View style={{ alignItems: "center" }}>
+            <View style={styles.buttonContent}>
               <Text style={styles.buttonText}>🟢 I'M HERE</Text>
-              <Text style={styles.buttonSubText}>Tap to Start Work</Text>
+              <Text style={styles.buttonSubText}>Tap once to start work</Text>
             </View>
           )}
         </TouchableOpacity>
+
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>⚠️ {error}</Text>
+          </View>
+        )}
       </View>
     </View>
   );

@@ -9,18 +9,23 @@ export interface StudentInfo {
   contact_number: string;
   contact_number_guardian: string;
   remarks: string;
+  parent_pin?: string;
 }
 
 export interface Mood {
-  // Define according to your backend's Mood model
-  [key: string]: any;
+  id?: number;
+  student_id?: number;
+  recorded_at: string;
+  emotion: "happy" | "neutral" | "sad" | string;
+  is_daily?: boolean;
 }
 
 export interface AttendanceRecord {
   scheduled_check_in: string;
   scheduled_check_out: string;
   actual_check_in: string;
-  actual_check_out: string;
+  actual_check_out?: string | null;
+  arrived_home_date_time?: string | null;
 }
 
 export interface TraineeProfileResponse {

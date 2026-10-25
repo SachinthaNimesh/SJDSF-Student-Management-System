@@ -13,7 +13,7 @@ const PostEmotion = ({ navigation, route }: Props) => {
   const [showAnimation, setShowAnimation] = useState(false);
 
   useEffect(() => {
-    const message = "Mood Saved!";
+    const message = "Mood Saved!\nHave a wonderful day! 😊";
     setThankYouText(message);
 
     const timer1 = setTimeout(() => {

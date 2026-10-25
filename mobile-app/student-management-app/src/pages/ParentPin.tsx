@@ -1,14 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
@@ -24,15 +20,24 @@ type Props = {
 const ParentPin: React.FC<Props> = ({ navigation }) => {
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
-  const inputRef = useRef<any>(null);
 
-  const handlePinChange = (text: string) => {
-    // Only accept numeric digits, up to 4 characters
-    const numericText = text.replace(/\D/g, '').slice(0, 4);
-    setPin(numericText);
-    if (numericText.length > pin.length) {
+  const handleKeyPress = (digit: string) => {
+    if (pin.length < 4) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setPin((prev) => prev + digit);
     }
+  };
+
+  const handleDelete = () => {
+    if (pin.length > 0) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setPin((prev) => prev.slice(0, -1));
+    }
+  };
+
+  const handleClear = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setPin('');
   };
 
   const handleConfirmArrival = async () => {
@@ -47,7 +52,6 @@ const ParentPin: React.FC<Props> = ({ navigation }) => {
       setLoading(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
-      // 1. Get current device location
       let lat = 0;
       let long = 0;
       try {
@@ -60,7 +64,6 @@ const ParentPin: React.FC<Props> = ({ navigation }) => {
         console.warn('Location retrieval warning:', locErr);
       }
 
-      // 2. Post arrived home with PIN verification
       const response: any = await postArrivedHome(pin, lat, long);
 
       if (response && response.success === false) {
@@ -70,7 +73,6 @@ const ParentPin: React.FC<Props> = ({ navigation }) => {
         return;
       }
 
-      // Mark arrived home in storage
       const todayStr = new Date().toISOString().slice(0, 10);
       await AsyncStorage.setItem('ARRIVED_HOME_DATE', todayStr);
 
@@ -90,75 +92,118 @@ const ParentPin: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <TouchableWithoutFeedback onPress={() => inputRef.current?.focus()}>
-        <View style={styles.card}>
-          <View style={styles.iconContainer}>
-            <Text style={styles.iconText}>🏠</Text>
-          </View>
-
-          <Text style={styles.title}>Parent Verification</Text>
-          <Text style={styles.subtitle}>
-            Please enter your 4-digit PIN to confirm that the student has safely arrived home.
-          </Text>
-
-          {/* Hidden TextInput for native keyboard */}
-          <TextInput
-            ref={inputRef}
-            style={styles.hiddenInput}
-            keyboardType="number-pad"
-            maxLength={4}
-            value={pin}
-            onChangeText={handlePinChange}
-            autoFocus={true}
-          />
-
-          {/* 4 PIN display boxes */}
-          <TouchableOpacity
-            style={styles.pinContainer}
-            activeOpacity={1}
-            onPress={() => inputRef.current?.focus()}
-          >
-            {[0, 1, 2, 3].map((index) => {
-              const digit = pin[index];
-              const isFilled = digit !== undefined;
-              return (
-                <View
-                  key={index}
-                  style={[styles.pinBox, isFilled && styles.pinBoxFilled]}
-                >
-                  <Text style={styles.pinText}>{isFilled ? '●' : ''}</Text>
-                </View>
-              );
-            })}
-          </TouchableOpacity>
-
-          {/* Confirmation Button */}
-          <TouchableOpacity
-            style={[
-              styles.button,
-              (pin.length !== 4 || loading) && styles.buttonDisabled,
-            ]}
-            onPress={handleConfirmArrival}
-            disabled={pin.length !== 4 || loading}
-            activeOpacity={0.8}
-          >
-            {loading ? (
-              <ActivityIndicator color="#ffffff" />
-            ) : (
-              <Text style={styles.buttonText}>✓ Confirm Student Arrived Home</Text>
-            )}
-          </TouchableOpacity>
-
-          <Text style={styles.hintText}>
-            This action must be performed by the student's parent or guardian.
-          </Text>
+    <View style={styles.container}>
+      <View style={styles.card}>
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>🛡️ Parent / Guardian Zone</Text>
         </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+
+        <Text style={styles.title}>Confirm Arrival Home</Text>
+        <Text style={styles.subtitle}>
+          Enter your 4-digit PIN to verify student has safely arrived home.
+        </Text>
+
+        {/* 4 PIN Boxes */}
+        <View style={styles.pinContainer}>
+          {[0, 1, 2, 3].map((index) => {
+            const digit = pin[index];
+            const isFilled = digit !== undefined;
+            return (
+              <View
+                key={index}
+                style={[styles.pinBox, isFilled && styles.pinBoxFilled]}
+              >
+                <Text style={styles.pinText}>{isFilled ? '●' : ''}</Text>
+              </View>
+            );
+          })}
+        </View>
+
+        {/* On-Screen Numeric Keypad */}
+        <View style={styles.keypad}>
+          <View style={styles.keypadRow}>
+            {['1', '2', '3'].map((num) => (
+              <TouchableOpacity
+                key={num}
+                style={styles.keypadKey}
+                onPress={() => handleKeyPress(num)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.keypadText}>{num}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.keypadRow}>
+            {['4', '5', '6'].map((num) => (
+              <TouchableOpacity
+                key={num}
+                style={styles.keypadKey}
+                onPress={() => handleKeyPress(num)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.keypadText}>{num}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.keypadRow}>
+            {['7', '8', '9'].map((num) => (
+              <TouchableOpacity
+                key={num}
+                style={styles.keypadKey}
+                onPress={() => handleKeyPress(num)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.keypadText}>{num}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.keypadRow}>
+            <TouchableOpacity
+              style={[styles.keypadKey, styles.keypadKeySpecial]}
+              onPress={handleClear}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.keypadText, { fontSize: 14, color: '#64748b' }]}>
+                CLEAR
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.keypadKey}
+              onPress={() => handleKeyPress('0')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.keypadText}>0</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.keypadKey, styles.keypadKeySpecial]}
+              onPress={handleDelete}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.keypadText, { fontSize: 20 }]}>⌫</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Big Confirmation Button */}
+        <TouchableOpacity
+          style={[
+            styles.confirmButton,
+            (pin.length !== 4 || loading) && styles.confirmButtonDisabled,
+          ]}
+          onPress={handleConfirmArrival}
+          disabled={pin.length !== 4 || loading}
+          activeOpacity={0.82}
+        >
+          {loading ? (
+            <ActivityIndicator color="#ffffff" />
+          ) : (
+            <Text style={styles.confirmButtonText}>
+              ✓ Confirm Student Arrived Home
+            </Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 

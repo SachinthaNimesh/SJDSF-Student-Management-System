@@ -34,11 +34,17 @@ func GetTraineeProfile(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch student info
 	var student models.Student
-	err = database.DB.QueryRow("SELECT id, first_name, last_name, dob, gender, address_line1, address_line2, city, contact_number, contact_number_guardian, supervisor_id, remarks, home_long, home_lat, employer_id, check_in_time, check_out_time FROM student WHERE id = $1", studentID).Scan(&student.ID, &student.FirstName, &student.LastName, &student.DOB, &student.Gender, &student.AddressLine1, &student.AddressLine2, &student.City, &student.ContactNumber, &student.ContactNumberGuardian, &student.SupervisorID, &student.Remarks, &student.HomeLong, &student.HomeLat, &student.EmployerID, &student.CheckInTime, &student.CheckOutTime)
+	var parentPIN sql.NullString
+	err = database.DB.QueryRow("SELECT id, first_name, last_name, dob, gender, address_line1, address_line2, city, contact_number, contact_number_guardian, supervisor_id, remarks, home_long, home_lat, employer_id, check_in_time, check_out_time, parent_pin FROM student WHERE id = $1", studentID).Scan(&student.ID, &student.FirstName, &student.LastName, &student.DOB, &student.Gender, &student.AddressLine1, &student.AddressLine2, &student.City, &student.ContactNumber, &student.ContactNumberGuardian, &student.SupervisorID, &student.Remarks, &student.HomeLong, &student.HomeLat, &student.EmployerID, &student.CheckInTime, &student.CheckOutTime, &parentPIN)
 	if err != nil {
 		log.Printf("Failed to find student: %v", err)
 		http.Error(w, "Student not found", http.StatusNotFound)
 		return
+	}
+	if parentPIN.Valid {
+		student.ParentPIN = parentPIN.String
+	} else {
+		student.ParentPIN = "1234"
 	}
 
 	// Fetch employer name
@@ -56,7 +62,7 @@ func GetTraineeProfile(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch recent moods
 	var recentMoods []models.Mood
-	rows, err := database.DB.Query("SELECT id, student_id, recorded_at, emotion, is_daily FROM mood WHERE student_id = $1 AND is_daily = true ORDER BY recorded_at DESC LIMIT 5", studentID)
+	rows, err := database.DB.Query("SELECT id, student_id, recorded_at, emotion, is_daily FROM mood WHERE student_id = $1 AND is_daily = true ORDER BY recorded_at DESC LIMIT 15", studentID)
 	if err != nil {
 		log.Printf("Error fetching mood data: %v", err)
 		// Continue execution even if mood data can't be fetched
@@ -78,19 +84,21 @@ func GetTraineeProfile(w http.ResponseWriter, r *http.Request) {
 		ScheduledCheckOut string  `json:"scheduled_check_out"`
 		ActualCheckIn     string  `json:"actual_check_in"`
 		ActualCheckOut    *string `json:"actual_check_out"`
+		ArrivedHomeTime   *string `json:"arrived_home_date_time"`
 	}
 
 	query := `
 		SELECT 
-			s.check_in_time AS scheduled_check_in,
-			s.check_out_time AS scheduled_check_out,
+			COALESCE(s.check_in_time, '') AS scheduled_check_in,
+			COALESCE(s.check_out_time, '') AS scheduled_check_out,
 			a.check_in_date_time AS actual_check_in,
-			a.check_out_date_time AS actual_check_out
+			a.check_out_date_time AS actual_check_out,
+			a.arrived_home_date_time
 		FROM student s
 		JOIN attendance a ON s.id = a.student_id
 		WHERE s.id = $1
 		ORDER BY a.check_in_date_time DESC
-		LIMIT 5`
+		LIMIT 15`
 
 	rows, err = database.DB.Query(query, studentID)
 	if err != nil {
@@ -101,13 +109,15 @@ func GetTraineeProfile(w http.ResponseWriter, r *http.Request) {
 		for rows.Next() {
 			var checkInDateTime time.Time
 			var checkOutDateTime sql.NullTime
+			var arrivedHomeDateTime sql.NullTime
 			var rec struct {
 				ScheduledCheckIn  string  `json:"scheduled_check_in"`
 				ScheduledCheckOut string  `json:"scheduled_check_out"`
 				ActualCheckIn     string  `json:"actual_check_in"`
 				ActualCheckOut    *string `json:"actual_check_out"`
+				ArrivedHomeTime   *string `json:"arrived_home_date_time"`
 			}
-			if err := rows.Scan(&rec.ScheduledCheckIn, &rec.ScheduledCheckOut, &checkInDateTime, &checkOutDateTime); err != nil {
+			if err := rows.Scan(&rec.ScheduledCheckIn, &rec.ScheduledCheckOut, &checkInDateTime, &checkOutDateTime, &arrivedHomeDateTime); err != nil {
 				log.Printf("Error scanning attendance row: %v", err)
 				continue
 			}
@@ -115,6 +125,10 @@ func GetTraineeProfile(w http.ResponseWriter, r *http.Request) {
 			if checkOutDateTime.Valid {
 				outStr := checkOutDateTime.Time.Format(time.RFC3339)
 				rec.ActualCheckOut = &outStr
+			}
+			if arrivedHomeDateTime.Valid {
+				homeStr := arrivedHomeDateTime.Time.Format(time.RFC3339)
+				rec.ArrivedHomeTime = &homeStr
 			}
 			recentAttendanceRecords = append(recentAttendanceRecords, rec)
 		}
@@ -129,6 +143,7 @@ func GetTraineeProfile(w http.ResponseWriter, r *http.Request) {
 		ContactNumberGuardian string `json:"contact_number_guardian"`
 		Remarks               string `json:"remarks"`
 		EmployerName          string `json:"employer_name,omitempty"`
+		ParentPIN             string `json:"parent_pin"`
 	}{
 		FirstName:             student.FirstName,
 		LastName:              student.LastName,
@@ -137,6 +152,7 @@ func GetTraineeProfile(w http.ResponseWriter, r *http.Request) {
 		ContactNumberGuardian: student.ContactNumberGuardian,
 		Remarks:               student.Remarks,
 		EmployerName:          employerName,
+		ParentPIN:             student.ParentPIN,
 	}
 
 	response := struct {

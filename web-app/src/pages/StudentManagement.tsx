@@ -444,188 +444,216 @@ const StudentManagement = () => {
     .split("T")[0];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100">
-      <div className="flex flex-1">
-        <main className="flex-1 p-6">
-          <div className="max-w-7xl mx-auto">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
-              <div>
-                <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent tracking-tight">
-                  Student Management
-                </h2>
-              </div>
-              <Button
-                onClick={handleAddStudent}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Student
-              </Button>
+    <div className="min-h-screen bg-slate-50/60 pb-12">
+      {/* Top Header */}
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-10 px-6 py-4 shadow-xs">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-600 mb-1">
+              <span>Shiranee Joseph de Saram Foundation</span>
+              <span>•</span>
+              <span>Trainee Operations</span>
             </div>
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+              Trainee & Employee Management
+            </h1>
+          </div>
+          <Button
+            onClick={handleAddStudent}
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors rounded-xl font-semibold px-4 py-2"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add New Trainee
+          </Button>
+        </div>
+      </div>
 
-            {/* Search and Stats Section */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="md:col-span-3">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <Input
-                    className="pl-10 bg-white/80 backdrop-blur-sm shadow-sm border-gray-200 rounded-xl w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-200"
-                    placeholder="Search students by name or ID..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      onClick={() => setSearchQuery("")}
-                      tabIndex={-1}
-                      aria-label="Clear search"
-                    >
-                      <X className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                    </button>
-                  )}
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-4 text-white shadow-md">
-                <p className="text-sm font-medium opacity-90">Total Students</p>
-                <p className="text-2xl font-bold mt-1">
-                  {managementData.length}
-                </p>
-              </div>
-            </div>
-
-            {/* Table Section */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100/50 overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-gradient-to-r from-gray-50 to-gray-100/50">
-                    <TableHead className="w-16 font-semibold text-gray-700">
-                      ID
-                    </TableHead>
-                    <TableHead className="font-semibold text-gray-700">
-                      NAME
-                    </TableHead>
-                    <TableHead className="font-semibold text-gray-700">
-                      EMPLOYER
-                    </TableHead>
-                    <TableHead className="font-semibold text-gray-700">
-                      EMPLOYER CONTACT
-                    </TableHead>
-                    <TableHead className="font-semibold text-gray-700">
-                      SUPERVISOR
-                    </TableHead>
-                    <TableHead className="font-semibold text-gray-700">
-                      SUPERVISOR CONTACT
-                    </TableHead>
-                    <TableHead className="font-semibold text-gray-700">
-                      PARENT PIN
-                    </TableHead>
-                    <TableHead className="w-24 font-semibold text-gray-700">
-                      ACTION
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center">
-                        Loading...
-                      </TableCell>
-                    </TableRow>
-                  ) : filteredSortedManagementData.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center">
-                        No students found.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredSortedManagementData.map((item) => (
-                      <TableRow
-                        key={item.student_id}
-                        className="hover:bg-blue-50/50 transition-colors duration-200"
-                      >
-                        <TableCell className="font-medium text-gray-900">
-                          {item.student_id}
-                        </TableCell>
-                        <TableCell className="text-gray-700">
-                          {item.student_first_name} {item.student_last_name}
-                        </TableCell>
-                        <TableCell className="text-gray-700">
-                          {item.employer_name || "-"}
-                        </TableCell>
-                        <TableCell className="text-gray-700">
-                          {item.employer_contact_number || "-"}
-                        </TableCell>
-                        <TableCell className="text-gray-700">
-                          {(item.supervisor_first_name || "-") +
-                            " " +
-                            (item.supervisor_last_name || "")}
-                        </TableCell>
-                        <TableCell className="text-gray-700">
-                          {item.supervisor_contact_number || "-"}
-                        </TableCell>
-                        <TableCell className="text-gray-700">
-                          <span className="font-mono bg-indigo-50 border border-indigo-200 text-indigo-700 px-2 py-0.5 rounded text-xs font-semibold">
-                            {item.parent_pin || "1234"}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex space-x-2">
-                            {/* UPDATED: Edit button with disabled state */}
-                            <button
-                              onClick={() => handleEditStudent(item)}
-                              disabled={
-                                isDeleting !== null || otpLoadingId !== null
-                              }
-                              className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Edit student"
-                            >
-                              <Edit className="h-5 w-5" />
-                            </button>
-                            {/* UPDATED: Delete button with disabled state */}
-                            <button
-                              className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Delete student"
-                              onClick={() =>
-                                handleDeleteStudent(item.student_id)
-                              }
-                              disabled={
-                                isDeleting !== null || otpLoadingId !== null
-                              }
-                            >
-                              {isDeleting === item.student_id ? (
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                              ) : (
-                                <Trash className="h-5 w-5" />
-                              )}
-                            </button>
-                            {/* UPDATED: OTP Button with loading state */}
-                            <button
-                              className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Send OTP"
-                              onClick={() => handleOtpClick(item.student_id)}
-                              disabled={
-                                isDeleting !== null || otpLoadingId !== null
-                              }
-                            >
-                              {otpLoadingId === item.student_id ? (
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                              ) : (
-                                <Key className="h-5 w-5" />
-                              )}
-                            </button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+      <div className="max-w-7xl mx-auto px-6 pt-6">
+        {/* Search & Stats Bar */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="md:col-span-3">
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+              <Input
+                className="pl-10 bg-white border-slate-200 rounded-xl w-full text-sm shadow-xs focus:ring-2 focus:ring-blue-500 transition-all"
+                placeholder="Search trainees by name or ID..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Clear search"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </div>
-        </main>
+          <div className="bg-white border border-slate-200/80 rounded-xl p-4 shadow-xs flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Total Enrolled
+              </p>
+              <p className="text-2xl font-extrabold text-slate-900 mt-0.5">
+                {managementData.length}
+              </p>
+            </div>
+            <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
+              Active Roster
+            </span>
+          </div>
+        </div>
+
+        {/* Trainee Table */}
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-50/70 border-b border-slate-100">
+                <TableHead className="w-16 font-semibold text-slate-700 text-xs">
+                  ID
+                </TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs">
+                  TRAINEE NAME
+                </TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs">
+                  EMPLOYER & CONTACT
+                </TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs">
+                  SUPERVISOR
+                </TableHead>
+                <TableHead className="font-semibold text-slate-700 text-xs">
+                  PARENT HOME PIN
+                </TableHead>
+                <TableHead className="w-28 text-right font-semibold text-slate-700 text-xs">
+                  ACTIONS
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-12 text-slate-400">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-blue-600" />
+                    Loading trainee directory...
+                  </TableCell>
+                </TableRow>
+              ) : filteredSortedManagementData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-12 text-slate-400">
+                    No trainees found matching your search.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredSortedManagementData.map((item) => {
+                  const initials = `${item.student_first_name?.[0] || ""}${
+                    item.student_last_name?.[0] || ""
+                  }`.toUpperCase();
+
+                  return (
+                    <TableRow
+                      key={item.student_id}
+                      className="hover:bg-slate-50/70 transition-colors"
+                    >
+                      <TableCell className="font-mono text-xs font-bold text-slate-500">
+                        #{item.student_id}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-xs flex-shrink-0">
+                            {initials}
+                          </div>
+                          <div>
+                            <a
+                              href={`/student/${item.student_id}`}
+                              className="font-bold text-slate-900 text-sm hover:text-blue-600 transition-colors flex items-center gap-1"
+                            >
+                              {item.student_first_name} {item.student_last_name}
+                            </a>
+                            <span className="text-[11px] text-slate-400">
+                              View Trainee Dossier →
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          <p className="font-semibold text-slate-800">
+                            {item.employer_name || "Unassigned"}
+                          </p>
+                          {item.employer_contact_number && (
+                            <p className="text-xs text-slate-500">
+                              {item.employer_contact_number}
+                            </p>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          <p className="font-medium text-slate-800">
+                            {item.supervisor_first_name
+                              ? `${item.supervisor_first_name} ${item.supervisor_last_name || ""}`
+                              : "Not assigned"}
+                          </p>
+                          {item.supervisor_contact_number && (
+                            <p className="text-xs text-slate-500">
+                              {item.supervisor_contact_number}
+                            </p>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200/80">
+                          <span className="text-xs font-mono font-bold text-indigo-900 tracking-wider">
+                            {item.parent_pin || "1234"}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => handleEditStudent(item)}
+                            disabled={isDeleting !== null || otpLoadingId !== null}
+                            className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-40"
+                            title="Edit Trainee Details"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleOtpClick(item.student_id)}
+                            disabled={isDeleting !== null || otpLoadingId !== null}
+                            className="p-1.5 text-slate-600 hover:text-emerald-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-40"
+                            title="Generate Mobile OTP"
+                          >
+                            {otpLoadingId === item.student_id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Key className="h-4 w-4" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteStudent(item.student_id)}
+                            disabled={isDeleting !== null || otpLoadingId !== null}
+                            className="p-1.5 text-slate-600 hover:text-rose-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-40"
+                            title="Delete Trainee"
+                          >
+                            {isDeleting === item.student_id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Add/Edit Student Dialog */}

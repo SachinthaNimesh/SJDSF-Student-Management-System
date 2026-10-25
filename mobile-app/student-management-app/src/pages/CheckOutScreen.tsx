@@ -86,29 +86,33 @@ const CheckOutScreen: React.FC<Props> = ({ navigation }) => {
     <View style={styles.container} accessible={true} accessibilityLabel="Check Out Screen">
       <View style={styles.card}>
         {/* Lottie animation for home */}
-        <View style={{ width: 120, height: 120, marginBottom: 20 }}>
+        <View style={{ width: 130, height: 130, marginBottom: 12 }}>
           <LottieView
             source={{
               uri: "https://lottie.host/e0fe36ea-db79-48fc-b40a-8c550970cc09/iKa9zRuPni.lottie",
             }}
             autoPlay
             loop
-            style={{ width: 120, height: 120 }}
+            style={{ width: 130, height: 130 }}
           />
         </View>
-        <Text style={styles.title}>Leaving?</Text>
+        <Text style={styles.title}>Finished for Today? 👋</Text>
+        <Text style={styles.subtitle}>Tap below when you are ready to head home.</Text>
+
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
           onPress={handleCheckOut}
           disabled={loading}
-          accessibilityLabel="Check out"
+          accessibilityLabel="Check out and finish work"
           accessibilityState={{ disabled: loading }}
+          activeOpacity={0.82}
         >
           {loading ? (
             <Loader />
           ) : (
             <View style={styles.buttonContent}>
-              <Text style={styles.buttonText}>Out</Text>
+              <Text style={styles.buttonText}>👋 FINISH WORK</Text>
+              <Text style={styles.buttonSubText}>Tap to check out</Text>
             </View>
           )}
         </TouchableOpacity>

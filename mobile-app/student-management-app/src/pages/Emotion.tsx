@@ -191,9 +191,16 @@ const Emotion: React.FC<Props> = ({ navigation }) => {
       <View style={styles.headerSpacer} />
       <View style={styles.contentWrapper}>
         <View style={styles.moodCard}>
-          <Text style={styles.title}>How are you?</Text>
+          <Text style={styles.title}>How are you feeling?</Text>
+          <Text style={styles.subtitle}>Tap the face that matches your mood</Text>
           <View style={styles.moodButtons}>
-            {(["happy", "neutral", "sad"] as const).map((mood) => (
+            {(
+              [
+                { key: "happy", label: "Happy & Good", style: styles.happyButton, textStyle: styles.happyText },
+                { key: "neutral", label: "Okay / Normal", style: styles.neutralButton, textStyle: styles.neutralText },
+                { key: "sad", label: "Sad / Not Well", style: styles.sadButton, textStyle: styles.sadText },
+              ] as const
+            ).map(({ key: mood, label, style: buttonStyle, textStyle }) => (
               <Animated.View
                 key={mood}
                 style={{
@@ -204,49 +211,31 @@ const Emotion: React.FC<Props> = ({ navigation }) => {
                 <TouchableOpacity
                   style={[
                     styles.moodButton,
+                    buttonStyle,
                     activeMood === mood && loading ? styles.selectedMood : null,
                   ]}
                   onPressIn={() => handleMoodPressIn(mood)}
                   onPressOut={() => handleMoodPressOut(mood)}
                   onPress={() => handleMoodPress(mood)}
                   disabled={loading || activeMood !== null}
-                  activeOpacity={0.8}
-                  accessibilityLabel={`Select mood: ${mood}`}
+                  activeOpacity={0.85}
+                  accessibilityLabel={`Select mood: ${label}`}
                   accessibilityRole="button"
                 >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      flex: 1,
-                      minWidth: 120,
-                      minHeight: 64,
-                    }}
-                  >
-                    <View
-                      style={[
-                        styles.moodEmoji,
-                        mood === "happy"
-                          ? styles.happy
-                          : mood === "neutral"
-                          ? styles.neutral
-                          : styles.sad,
-                      ]}
-                    >
-                      <Text style={styles.emojiText}>{moodEmojis[mood]}</Text>
-                    </View>
-                    <Text style={styles.moodText}>
-                      {mood.charAt(0).toUpperCase() + mood.slice(1)}
-                    </Text>
-                    <View style={styles.flexGrow} />
-                    {activeMood === mood && loading && (
-                      <ActivityIndicator
-                        size="small"
-                        color="#8B7ED8"
-                        style={{ marginLeft: 10 }}
-                      />
-                    )}
+                  <View style={styles.moodEmoji}>
+                    <Text style={styles.emojiText}>{moodEmojis[mood]}</Text>
                   </View>
+                  <Text style={[styles.moodText, textStyle]}>
+                    {label}
+                  </Text>
+                  <View style={styles.flexGrow} />
+                  {activeMood === mood && loading && (
+                    <ActivityIndicator
+                      size="small"
+                      color="#6366f1"
+                      style={{ marginLeft: 10 }}
+                    />
+                  )}
                 </TouchableOpacity>
               </Animated.View>
             ))}
