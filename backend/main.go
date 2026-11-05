@@ -56,6 +56,19 @@ func main() {
 	authService := controllers.NewAuthService()
 	authService.RegisterRoutes(router)
 
+	// Health and root status endpoints
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"online","service":"SJDSF Student Management System API","version":"1.0.0"}`))
+	}).Methods("GET", "HEAD")
+
+	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"healthy"}`))
+	}).Methods("GET", "HEAD")
+
 	// Register API routes
 	routes.RegisterStudentRoutes(router)
 
