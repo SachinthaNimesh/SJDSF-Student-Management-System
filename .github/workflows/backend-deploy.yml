@@ -1,0 +1,53 @@
+name: Deploy Backend to Azure App Service
+
+# Trigger: only when files inside backend/ change on the main branch
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+  workflow_dispatch: # Allow manual trigger from GitHub Actions UI
+
+jobs:
+  build-and-deploy:
+    name: Build Go Binary & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the full repository code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up the Go toolchain (matches your go.mod version)
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: true
+          cache-dependency-path: backend/go.sum
+
+      # 3. Download all Go module dependencies
+      - name: Download dependencies
+        working-directory: ./backend
+        run: go mod download
+
+      # 4. Compile the Go binary targeting Linux amd64
+      #    CGO_ENABLED=0 produces a fully static binary (no libc dependency)
+      - name: Build Linux binary
+        working-directory: ./backend
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
+
+      # 5. Package only the binary into a zip for Azure zip deploy
+      - name: Create deployment zip
+        working-directory: ./backend
+        run: zip deploy.zip main
+
+      # 6. Deploy the zip to Azure App Service using the publish profile
+      #    AZURE_BACKEND_PUBLISH_PROFILE is a GitHub Secret you will add in the guide
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: sjdsf-backend        # Must match your App Service name in Azure
+          publish-profile: ${{ secrets.AZURE_BACKEND_PUBLISH_PROFILE }}
+          package: ./backend/deploy.zip

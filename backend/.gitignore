@@ -36,3 +36,9 @@ jspm_packages/
 .DS_Store
 Thumbs.db
 
+# Go binaries and deployment packages
+main
+*.zip
+deploy.zip
+
+
