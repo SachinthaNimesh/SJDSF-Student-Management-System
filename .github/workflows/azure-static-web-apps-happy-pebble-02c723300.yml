@@ -32,6 +32,11 @@ jobs:
           api_location: "" # Api source code path - optional
           output_location: "dist" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
+        env:
+          VITE_API_URL: https://worky-backend-ftc9fbeedke6eaey.southindia-01.azurewebsites.net
+          VITE_ENABLE_LOCAL_AUTH: "false"
+          VITE_AZURE_CLIENT_ID: 5c56226d-c941-438d-b0f6-4bd91f58d758
+          VITE_AZURE_TENANT_ID: 14f8f366-8606-428d-a5c7-91c275bcfdf8
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
