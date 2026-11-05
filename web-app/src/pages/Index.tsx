@@ -10,6 +10,8 @@ import {
   MOCK_LOCAL_USER,
   storeUserInfo,
   clearStoredUserInfo,
+  login,
+  logout,
 } from "../utils/authUtils";
 
 const Index = () => {
@@ -94,25 +96,14 @@ const Index = () => {
       return;
     }
     setIsLoading(true);
-    window.location.href = "/auth/login";
+    login();
   };
 
   const handleLogout = () => {
-    // Clear stored user info
     clearStoredUserInfo();
     setSignedIn(false);
     setUser(null);
-
-    if (isLocalAuth()) {
-      toast.info("Logged out from Local session");
-      return;
-    }
-
-    // Redirect to Choreo logout
-    const sessionHint = Cookies.get("session_hint");
-    window.location.href = `/auth/logout${
-      sessionHint ? `?session_hint=${sessionHint}` : ""
-    }`;
+    logout();
   };
 
   // Show loading state while checking authentication

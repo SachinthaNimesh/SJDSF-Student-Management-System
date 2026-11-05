@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from "react";
-import { isLocalAuth } from "../utils/authUtils";
+import { isLocalAuth, login } from "../utils/authUtils";
 
 interface Props {
   children: ReactNode;
@@ -32,7 +32,7 @@ class ErrorBoundary extends Component<Props, State> {
 
       // Redirect to login only in cloud/Azure mode
       if (!isLocalAuth()) {
-        window.location.href = "/auth/login";
+        login();
       } else {
         window.location.href = "/";
       }

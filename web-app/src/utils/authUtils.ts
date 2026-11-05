@@ -43,7 +43,8 @@ export function login() {
     window.location.href = "/dashboard";
     return;
   }
-  window.location.href = "/auth/login";
+  // On Azure Static Web Apps, the native Microsoft Entra ID route is /.auth/login/aad
+  window.location.href = "/.auth/login/aad?post_login_redirect_uri=/dashboard";
 }
 
 export function logout() {
@@ -54,8 +55,8 @@ export function logout() {
     return;
   }
 
-  const sessionHint = Cookies.get("session_hint");
-  window.location.href = `/auth/logout${sessionHint ? `?session_hint=${sessionHint}` : ""}`;
+  // On Azure Static Web Apps, native logout route is /.auth/logout
+  window.location.href = "/.auth/logout?post_logout_redirect_uri=/";
 }
 
 export function getUserInfoFromCookie(): UserInfo | null {
@@ -79,6 +80,40 @@ export async function getUserInfoFromEndpoint(): Promise<UserInfo | null> {
     return MOCK_LOCAL_USER;
   }
 
+  // 1. Try Azure Static Web Apps built-in auth endpoint (/.auth/me)
+  try {
+    const res = await fetch("/.auth/me");
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.clientPrincipal) {
+        const principal = data.clientPrincipal;
+        const email = principal.userDetails || "";
+        const nameClaim = principal.claims?.find(
+          (c: any) => c.typ === "name" || c.typ?.endsWith("/name")
+        )?.val || "";
+        const givenName = principal.claims?.find(
+          (c: any) => c.typ === "given_name" || c.typ?.endsWith("/givenname")
+        )?.val || "";
+        const surname = principal.claims?.find(
+          (c: any) => c.typ === "family_name" || c.typ?.endsWith("/surname")
+        )?.val || "";
+
+        const nameParts = nameClaim ? nameClaim.split(" ") : [];
+        const firstName = givenName || nameParts[0] || (email ? email.split("@")[0] : "User");
+        const lastName = surname || nameParts.slice(1).join(" ") || "";
+
+        return {
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+        };
+      }
+    }
+  } catch (err) {
+    console.debug("Failed to fetch from /.auth/me:", err);
+  }
+
+  // 2. Fall back to /auth/userinfo endpoint (Choreo or local proxy)
   try {
     const response = await fetch("/auth/userinfo");
     if (response.ok) {
@@ -163,7 +198,7 @@ export async function performGet(url: string) {
     if (response.status === 401) {
       clearStoredUserInfo();
       if (!isLocalAuth()) {
-        window.location.href = "/auth/login";
+        login();
       } else {
         window.location.href = "/";
       }

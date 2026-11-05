@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { API_URL } from '../config/configs';
-import { isLocalAuth } from '../utils/authUtils';
+import { isLocalAuth, login } from '../utils/authUtils';
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -41,7 +41,7 @@ apiClient.interceptors.response.use(
           sessionStorage.removeItem('userInfo');
           
           // Redirect to login page
-          window.location.href = '/auth/login';
+          login();
         }
         return Promise.reject(new Error('Authentication failed'));
       }

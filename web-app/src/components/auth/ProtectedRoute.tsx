@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { isLocalAuth, MOCK_LOCAL_USER, storeUserInfo } from '../../utils/authUtils';
+import { isLocalAuth, MOCK_LOCAL_USER, storeUserInfo, login } from '../../utils/authUtils';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -18,8 +18,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         storeUserInfo(MOCK_LOCAL_USER);
         setUser(MOCK_LOCAL_USER);
       } else {
-        // Redirect to Azure AD login in cloud/Choreo mode
-        window.location.href = '/auth/login';
+        // Redirect to Azure Entra ID login
+        login();
       }
     }
   }, [user, loading, navigate, setUser]);
