@@ -1,8 +1,8 @@
 -- Seed Data for SJDSF Student Management System
--- Provides 10 realistic test records per table
+-- Provides 10 realistic test records per table (10 tables total)
 
--- Clean existing data (optional, cascading from parent tables)
-TRUNCATE TABLE attendance, mood, otps, authorized_devices, student, employer, supervisor, emergency_contact RESTART IDENTITY CASCADE;
+-- Clean existing data (cascading from parent tables)
+TRUNCATE TABLE student_locations, student_feedback, attendance, mood, otps, authorized_devices, student, employer, supervisor, emergency_contact RESTART IDENTITY CASCADE;
 
 -- 1. Insert 10 Supervisors
 INSERT INTO supervisor (supervisor_id, first_name, last_name, email_address, contact_number) VALUES
@@ -37,33 +37,33 @@ INSERT INTO employer (id, name, contact_number, address_line1, address_line2, ad
 SELECT setval('employer_id_seq', (SELECT MAX(id) FROM employer));
 
 -- 3. Insert 10 Students (Trainees)
-INSERT INTO student (id, first_name, last_name, dob, gender, address_line1, address_line2, city, contact_number, contact_number_guardian, supervisor_id, remarks, home_long, home_lat, employer_id, check_in_time, check_out_time) VALUES
-(1, 'Avantha', 'Fernando', '2001-04-12', 'Male', '14/2 Temple Road', 'Maharagama', 'Colombo', '+94 77 111 2233', '+94 77 999 1122', 1, 'Punctual and keen to learn backend development', 79.9245, 6.8480, 1, '08:30', '17:00'),
-(2, 'Oshadi', 'Perera', '2002-08-25', 'Female', '45 Station Road', 'Dehiwala', 'Colombo', '+94 71 222 3344', '+94 71 888 2233', 2, 'Excels in UI/UX tasks; highly active in team discussions', 79.8672, 6.8510, 2, '09:00', '17:30'),
-(3, 'Sahan', 'Wickramasinghe', '2000-11-03', 'Male', '89 Kandy Road', 'Kelaniya', 'Gampaha', '+94 76 333 4455', '+94 76 777 3344', 3, 'Solid grasp of data structures and cloud platforms', 79.9180, 6.9740, 3, '08:30', '17:00'),
-(4, 'Tharushi', 'Jayakody', '2003-01-19', 'Female', '12 Lake Drive', 'Rajagiriya', 'Colombo', '+94 75 444 5566', '+94 75 666 4455', 4, 'Great communication; completed onboarding project ahead of schedule', 79.8940, 6.9110, 4, '08:45', '17:15'),
-(5, 'Dinuka', 'Mendis', '2001-06-30', 'Male', '67 Galle Road', 'Moratuwa', 'Colombo', '+94 78 555 6677', '+94 78 555 5566', 5, 'Consistently shows high initiative in customer support engineering', 79.8820, 6.7730, 5, '09:00', '17:30'),
-(6, 'Nadeesha', 'Alwis', '2002-03-14', 'Female', '23 School Lane', 'Nugegoda', 'Colombo', '+94 72 666 7788', '+94 72 444 6677', 6, 'Diligent worker with strong analytical capabilities', 79.8970, 6.8650, 6, '08:30', '17:00'),
-(7, 'Isuru', 'Rathnayake', '2000-09-08', 'Male', '101 Negombo Road', 'Ja-Ela', 'Gampaha', '+94 70 777 8899', '+94 70 333 7788', 7, 'Adapting well to modern mobile application stack', 79.8920, 7.0760, 7, '08:30', '17:00'),
-(8, 'Kavindi', 'Gamage', '2002-12-05', 'Female', '56 Beach Road', 'Mount Lavinia', 'Colombo', '+94 77 888 9900', '+94 77 222 8899', 8, 'Shows great interest in quality assurance and automated testing', 79.8630, 6.8380, 8, '09:00', '17:30'),
-(9, 'Bhanuka', 'Senanayake', '2001-07-22', 'Male', '34 Flower Road', 'Cinnamon Gardens', 'Colombo 07', '+94 71 999 0011', '+94 71 111 9900', 9, 'Demonstrates quick problem-solving skills in network administration', 79.8610, 6.9060, 9, '08:30', '17:00'),
-(10, 'Sachini', 'Herath', '2003-05-18', 'Female', '78 Hospital Road', 'Battaramulla', 'Colombo', '+94 76 000 1122', '+94 76 000 0011', 10, 'Dependable and dedicated; eager to improve software engineering skills', 79.9190, 6.8990, 10, '08:45', '17:15');
+INSERT INTO student (id, first_name, last_name, dob, gender, address_line1, address_line2, city, contact_number, contact_number_guardian, supervisor_id, remarks, home_long, home_lat, employer_id, check_in_time, check_out_time, parent_pin) VALUES
+(1, 'Avantha', 'Fernando', '2001-04-12', 'Male', '14/2 Temple Road', 'Maharagama', 'Colombo', '+94 77 111 2233', '+94 77 999 1122', 1, 'Punctual and keen to learn backend development', 79.9245, 6.8480, 1, '08:30', '17:00', '1234'),
+(2, 'Oshadi', 'Perera', '2002-08-25', 'Female', '45 Station Road', 'Dehiwala', 'Colombo', '+94 71 222 3344', '+94 71 888 2233', 2, 'Excels in UI/UX tasks; highly active in team discussions', 79.8672, 6.8510, 2, '09:00', '17:30', '2234'),
+(3, 'Sahan', 'Wickramasinghe', '2000-11-03', 'Male', '89 Kandy Road', 'Kelaniya', 'Gampaha', '+94 76 333 4455', '+94 76 777 3344', 3, 'Solid grasp of data structures and cloud platforms', 79.9180, 6.9740, 3, '08:30', '17:00', '1234'),
+(4, 'Tharushi', 'Jayakody', '2003-01-19', 'Female', '12 Lake Drive', 'Rajagiriya', 'Colombo', '+94 75 444 5566', '+94 75 666 4455', 4, 'Great communication; completed onboarding project ahead of schedule', 79.8940, 6.9110, 4, '08:45', '17:15', '4321'),
+(5, 'Dinuka', 'Mendis', '2001-06-30', 'Male', '67 Galle Road', 'Moratuwa', 'Colombo', '+94 78 555 6677', '+94 78 555 5566', 5, 'Consistently shows high initiative in customer support engineering', 79.8820, 6.7730, 5, '09:00', '17:30', '5678'),
+(6, 'Nadeesha', 'Alwis', '2002-03-14', 'Female', '23 School Lane', 'Nugegoda', 'Colombo', '+94 72 666 7788', '+94 72 444 6677', 6, 'Diligent worker with strong analytical capabilities', 79.8970, 6.8650, 6, '08:30', '17:00', '1111'),
+(7, 'Isuru', 'Rathnayake', '2000-09-08', 'Male', '101 Negombo Road', 'Ja-Ela', 'Gampaha', '+94 70 777 8899', '+94 70 333 7788', 7, 'Adapting well to modern mobile application stack', 79.8920, 7.0760, 7, '08:30', '17:00', '2222'),
+(8, 'Kavindi', 'Gamage', '2002-12-05', 'Female', '56 Beach Road', 'Mount Lavinia', 'Colombo', '+94 77 888 9900', '+94 77 222 8899', 8, 'Shows great interest in quality assurance and automated testing', 79.8630, 6.8380, 8, '09:00', '17:30', '3333'),
+(9, 'Bhanuka', 'Senanayake', '2001-07-22', 'Male', '34 Flower Road', 'Cinnamon Gardens', 'Colombo 07', '+94 71 999 0011', '+94 71 111 9900', 9, 'Demonstrates quick problem-solving skills in network administration', 79.8610, 6.9060, 9, '08:30', '17:00', '4444'),
+(10, 'Sachini', 'Herath', '2003-05-18', 'Female', '78 Hospital Road', 'Battaramulla', 'Colombo', '+94 76 000 1122', '+94 76 000 0011', 10, 'Dependable and dedicated; eager to improve software engineering skills', 79.9190, 6.8990, 10, '08:45', '17:15', '5555');
 
 -- Synchronize student sequence
 SELECT setval('student_id_seq', (SELECT MAX(id) FROM student));
 
--- 4. Insert 10 Attendance records (Current date check-ins and check-outs)
-INSERT INTO attendance (id, student_id, check_in_lat, check_in_long, check_in_date_time, check_out_lat, check_out_long, check_out_date_time) VALUES
-(1, 1, 6.9184, 79.8596, CURRENT_TIMESTAMP - INTERVAL '7 hours', 6.9184, 79.8596, CURRENT_TIMESTAMP - INTERVAL '1 hour'),
-(2, 2, 6.9015, 79.8529, CURRENT_TIMESTAMP - INTERVAL '6 hours', 6.9015, 79.8529, CURRENT_TIMESTAMP - INTERVAL '30 minutes'),
-(3, 3, 6.9210, 79.8560, CURRENT_TIMESTAMP - INTERVAL '8 hours', 6.9210, 79.8560, CURRENT_TIMESTAMP - INTERVAL '2 hours'),
-(4, 4, 6.9056, 79.8517, CURRENT_TIMESTAMP - INTERVAL '7 hours', 6.9056, 79.8517, NULL),
-(5, 5, 6.9385, 79.8821, CURRENT_TIMESTAMP - INTERVAL '6 hours', 6.9385, 79.8821, CURRENT_TIMESTAMP - INTERVAL '15 minutes'),
-(6, 6, 6.8772, 79.8601, CURRENT_TIMESTAMP - INTERVAL '7 hours 30 minutes', 6.8772, 79.8601, CURRENT_TIMESTAMP - INTERVAL '1 hour'),
-(7, 7, 6.9319, 79.8504, CURRENT_TIMESTAMP - INTERVAL '8 hours', 6.9319, 79.8504, NULL),
-(8, 8, 6.9360, 79.8450, CURRENT_TIMESTAMP - INTERVAL '6 hours', 6.9360, 79.8450, CURRENT_TIMESTAMP - INTERVAL '45 minutes'),
-(9, 9, 6.8654, 79.8978, CURRENT_TIMESTAMP - INTERVAL '7 hours', 6.8654, 79.8978, CURRENT_TIMESTAMP - INTERVAL '2 hours'),
-(10, 10, 6.9247, 79.8690, CURRENT_TIMESTAMP - INTERVAL '7 hours 15 minutes', 6.9247, 79.8690, NULL);
+-- 4. Insert 10 Attendance records
+INSERT INTO attendance (id, student_id, check_in_lat, check_in_long, check_in_date_time, check_out_lat, check_out_long, check_out_date_time, arrived_home_lat, arrived_home_long, arrived_home_date_time) VALUES
+(1, 1, 6.9184, 79.8596, CURRENT_TIMESTAMP - INTERVAL '7 hours', 6.9184, 79.8596, CURRENT_TIMESTAMP - INTERVAL '1 hour', 6.8480, 79.9245, CURRENT_TIMESTAMP - INTERVAL '30 minutes'),
+(2, 2, 6.9015, 79.8529, CURRENT_TIMESTAMP - INTERVAL '6 hours', 6.9015, 79.8529, CURRENT_TIMESTAMP - INTERVAL '30 minutes', 6.8510, 79.8672, CURRENT_TIMESTAMP - INTERVAL '10 minutes'),
+(3, 3, 6.9210, 79.8560, CURRENT_TIMESTAMP - INTERVAL '8 hours', 6.9210, 79.8560, CURRENT_TIMESTAMP - INTERVAL '2 hours', 6.9740, 79.9180, CURRENT_TIMESTAMP - INTERVAL '1 hour'),
+(4, 4, 6.9056, 79.8517, CURRENT_TIMESTAMP - INTERVAL '7 hours', 6.9056, 79.8517, NULL, NULL, NULL, NULL),
+(5, 5, 6.9385, 79.8821, CURRENT_TIMESTAMP - INTERVAL '6 hours', 6.9385, 79.8821, CURRENT_TIMESTAMP - INTERVAL '15 minutes', 6.7730, 79.8820, CURRENT_TIMESTAMP - INTERVAL '5 minutes'),
+(6, 6, 6.8772, 79.8601, CURRENT_TIMESTAMP - INTERVAL '7 hours 30 minutes', 6.8772, 79.8601, CURRENT_TIMESTAMP - INTERVAL '1 hour', 6.8650, 79.8970, CURRENT_TIMESTAMP - INTERVAL '20 minutes'),
+(7, 7, 6.9319, 79.8504, CURRENT_TIMESTAMP - INTERVAL '8 hours', 6.9319, 79.8504, NULL, NULL, NULL, NULL),
+(8, 8, 6.9360, 79.8450, CURRENT_TIMESTAMP - INTERVAL '6 hours', 6.9360, 79.8450, CURRENT_TIMESTAMP - INTERVAL '45 minutes', 6.8380, 79.8630, CURRENT_TIMESTAMP - INTERVAL '15 minutes'),
+(9, 9, 6.8654, 79.8978, CURRENT_TIMESTAMP - INTERVAL '7 hours', 6.8654, 79.8978, CURRENT_TIMESTAMP - INTERVAL '2 hours', 6.9060, 79.8610, CURRENT_TIMESTAMP - INTERVAL '1 hour 15 minutes'),
+(10, 10, 6.9247, 79.8690, CURRENT_TIMESTAMP - INTERVAL '7 hours 15 minutes', 6.9247, 79.8690, NULL, NULL, NULL, NULL);
 
 -- Synchronize attendance sequence
 SELECT setval('attendance_id_seq', (SELECT MAX(id) FROM attendance));
@@ -84,7 +84,7 @@ INSERT INTO mood (id, student_id, recorded_at, emotion, is_daily) VALUES
 -- Synchronize mood sequence
 SELECT setval('mood_id_seq', (SELECT MAX(id) FROM mood));
 
--- 6. Insert 10 Active OTPs (4-digit codes matching student IDs for easy login testing)
+-- 6. Insert 10 Active OTPs (codes '1001'-'1010' for student login)
 INSERT INTO otps (id, student_id, otp_code, expires_at, is_used, created_at) VALUES
 (1, 1, '1001', CURRENT_TIMESTAMP + INTERVAL '30 days', false, CURRENT_TIMESTAMP),
 (2, 2, '1002', CURRENT_TIMESTAMP + INTERVAL '30 days', false, CURRENT_TIMESTAMP),
@@ -131,3 +131,35 @@ INSERT INTO emergency_contact (id, phone_number, updated_at) VALUES
 
 -- Synchronize emergency_contact sequence
 SELECT setval('emergency_contact_id_seq', (SELECT MAX(id) FROM emergency_contact));
+
+-- 9. Insert 10 Student Daily Feedbacks (Coworker/Manager observations)
+INSERT INTO student_feedback (id, student_id, feedback_text, submitted_at) VALUES
+(1, 1, 'Avantha performed exceptionally well today, helping colleagues and following all safety guidelines.', CURRENT_TIMESTAMP - INTERVAL '1 hour'),
+(2, 2, 'Oshadi completed her daily tasks ahead of schedule with great attention to detail. Excellent team attitude.', CURRENT_TIMESTAMP - INTERVAL '45 minutes'),
+(3, 3, 'Sahan demonstrated solid problem-solving on the assigned modules. Showed great focus throughout the shift.', CURRENT_TIMESTAMP - INTERVAL '2 hours'),
+(4, 4, 'Tharushi was very communicative and cooperative with the entire team. Keep up the high energy!', CURRENT_TIMESTAMP - INTERVAL '3 hours'),
+(5, 5, 'Dinuka took great initiative in organizing the workstations and supporting customer inquiries.', CURRENT_TIMESTAMP - INTERVAL '30 minutes'),
+(6, 6, 'Nadeesha showed high dedication and precision. Worked smoothly through complex instructions.', CURRENT_TIMESTAMP - INTERVAL '1 hour 15 minutes'),
+(7, 7, 'Isuru adapted quickly to new guidelines today and showed notable improvement in speed and quality.', CURRENT_TIMESTAMP - INTERVAL '2 hours 30 minutes'),
+(8, 8, 'Kavindi was meticulous with testing steps and maintained a calm, positive work environment.', CURRENT_TIMESTAMP - INTERVAL '50 minutes'),
+(9, 9, 'Bhanuka handled the afternoon rush calmly and demonstrated good situational awareness.', CURRENT_TIMESTAMP - INTERVAL '1 hour 45 minutes'),
+(10, 10, 'Sachini was punctual, polite, and followed supervisor directions with thoroughness.', CURRENT_TIMESTAMP - INTERVAL '4 hours');
+
+-- Synchronize student_feedback sequence
+SELECT setval('student_feedback_id_seq', (SELECT MAX(id) FROM student_feedback));
+
+-- 10. Insert 10 Student Location Pings (Periodic GPS tracking)
+INSERT INTO student_locations (id, student_id, latitude, longitude, accuracy, recorded_at) VALUES
+(1, 1, 6.9184, 79.8596, 5.2, CURRENT_TIMESTAMP - INTERVAL '50 minutes'),
+(2, 2, 6.9015, 79.8529, 6.1, CURRENT_TIMESTAMP - INTERVAL '40 minutes'),
+(3, 3, 6.9210, 79.8560, 4.8, CURRENT_TIMESTAMP - INTERVAL '1 hour 30 minutes'),
+(4, 4, 6.9056, 79.8517, 8.0, CURRENT_TIMESTAMP - INTERVAL '2 hours'),
+(5, 5, 6.9385, 79.8821, 5.0, CURRENT_TIMESTAMP - INTERVAL '25 minutes'),
+(6, 6, 6.8772, 79.8601, 7.3, CURRENT_TIMESTAMP - INTERVAL '1 hour'),
+(7, 7, 6.9319, 79.8504, 6.5, CURRENT_TIMESTAMP - INTERVAL '2 hours 15 minutes'),
+(8, 8, 6.9360, 79.8450, 4.2, CURRENT_TIMESTAMP - INTERVAL '35 minutes'),
+(9, 9, 6.8654, 79.8978, 5.9, CURRENT_TIMESTAMP - INTERVAL '1 hour 20 minutes'),
+(10, 10, 6.9247, 79.8690, 6.0, CURRENT_TIMESTAMP - INTERVAL '3 hours 45 minutes');
+
+-- Synchronize student_locations sequence
+SELECT setval('student_locations_id_seq', (SELECT MAX(id) FROM student_locations));

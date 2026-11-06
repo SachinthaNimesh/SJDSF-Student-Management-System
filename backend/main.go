@@ -23,6 +23,9 @@ func main() {
 	// Connect to DB with environment variables
 	database.ConnectDB()
 
+	// Ensure all 10 tables are populated with at least 10 records
+	controllers.CheckAndAutoSeed()
+
 	// Define router
 	router := mux.NewRouter()
 

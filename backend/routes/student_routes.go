@@ -72,4 +72,8 @@ func RegisterStudentRoutes(router *mux.Router) {
 	router.HandleFunc("/location-track", controllers.PostLocation).Methods("POST")
 	router.HandleFunc("/student/{id}/locations", controllers.GetStudentLocations).Methods("GET")
 	router.HandleFunc("/student-locations", controllers.GetStudentLocations).Methods("GET")
+
+	// Database Seeding and Status routes
+	router.HandleFunc("/seed-database", controllers.SeedDatabaseHandler).Methods("GET", "POST")
+	router.HandleFunc("/table-counts", controllers.TableCountsHandler).Methods("GET")
 }
