@@ -82,7 +82,7 @@ PORT=8080
 
 # Authentication Mode
 # 'local': Bypasses Azure AD auth, provides mock /auth/userinfo & /auth/login for local dev
-# 'azure': For production Choreo/Azure AD deployment
+# 'azure': For production Azure deployment (App Service / Azure AD)
 AUTH_MODE=local
 
 # --- Option 1: Full Database URL ---

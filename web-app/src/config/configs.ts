@@ -10,11 +10,7 @@ export const PRODUCTION_API_URL =
 
 function getBaseApiUrl(): string {
   // 1. Check window runtime override (if injected via config.js)
-  if (
-    isBrowser &&
-    window.config?.apiUrl &&
-    !window.config.apiUrl.startsWith("/choreo-apis")
-  ) {
+  if (isBrowser && window.config?.apiUrl) {
     if (isLocalhost || !window.config.apiUrl.includes("localhost")) {
       return window.config.apiUrl.replace(/\/+$/, "");
     }
@@ -26,12 +22,7 @@ function getBaseApiUrl(): string {
       ? (import.meta.env?.VITE_API_URL as string | undefined)
       : undefined;
 
-  if (
-    envUrl &&
-    typeof envUrl === "string" &&
-    envUrl.trim() !== "" &&
-    !envUrl.startsWith("/choreo-apis")
-  ) {
+  if (envUrl && typeof envUrl === "string" && envUrl.trim() !== "") {
     if (isLocalhost || !envUrl.includes("localhost")) {
       return envUrl.trim().replace(/\/+$/, "");
     }
@@ -47,7 +38,7 @@ export const API_URL = getBaseApiUrl();
 
 export const SUMMARIZER_API_URL =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_SUMMARIZER_API_URL) ||
-  "/choreo-apis/student-management-system/summarizer/v1";
+  "";
 
 declare global {
   interface Window {

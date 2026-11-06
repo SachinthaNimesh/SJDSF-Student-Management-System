@@ -35,12 +35,12 @@ Edit `.env`:
 # For local Go backend running on port 8080:
 VITE_API_URL=http://localhost:8080
 
-# For production Choreo deployment:
-# VITE_API_URL=/choreo-apis/student-management-system/backend/v1
+# For production Azure App Service deployment:
+# VITE_API_URL=https://worky-backend-ftc9fbeedke6eaey.southindia-01.azurewebsites.net
 
 # Local Authentication Switch
 # Set to 'true' to run locally without Azure AD auth redirects (uses mock Dev/Admin user)
-# Set to 'false' when deployed on Choreo with Azure AD managed authentication
+# Set to 'false' when deployed to Azure Static Web Apps with Microsoft Entra ID (Azure AD) authentication
 VITE_ENABLE_LOCAL_AUTH=true
 
 # Optional API Key
@@ -53,16 +53,16 @@ VITE_GOOGLE_SHEET_API_KEY=your_google_sheets_api_key
 ### 🔐 Local Authentication Switch vs Azure AD Mode
 
 * **Local Development (`VITE_ENABLE_LOCAL_AUTH=true` or running on `localhost`)**:
-  * Azure AD / Choreo auth redirects (`/auth/login`, `/auth/logout`) are bypassed.
+  * Azure AD auth redirects (`/.auth/login/aad`, `/.auth/logout`) are bypassed.
   * The home page shows **"Sign in (Local Dev)"** and signs in immediately as `Local Admin` (`admin@sjdsf.local`).
   * Protected routes automatically grant access without locking developers out.
   * A Vite proxy forwards any `/auth` calls to the local backend.
 * **Production Deployment (`VITE_ENABLE_LOCAL_AUTH=false`)**:
-  * Uses Choreo's managed authentication proxy with Azure AD single sign-on.
+  * Uses Azure Static Web Apps native Microsoft Entra ID (Azure AD) authentication via `/.auth/login/aad`.
 
-### 3. Runtime Deployment Configuration (Choreo / Production)
+### 3. Runtime Deployment Configuration (Azure Static Web Apps)
 
-For containerized cloud deployments (e.g. Choreo) where environment variables are injected at runtime without re-bundling, the web app loads [`public/config.js`](public/config.js). The app safely falls back to `import.meta.env` if `config.js` is not overridden.
+For cloud deployments where environment variables can be injected at runtime without re-bundling, the web app loads [`public/config.js`](public/config.js). The app safely falls back to `import.meta.env` and defaults to the Azure App Service backend if `config.js` is not overridden.
 
 ---
 

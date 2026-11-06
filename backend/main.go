@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	// Fetch port from environment (default to 8000 for Choreo)
+	// Fetch port from environment (default: 8080)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"

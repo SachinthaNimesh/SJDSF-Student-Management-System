@@ -38,7 +38,7 @@ const CheckOutScreen: React.FC<Props> = ({ navigation }) => {
     try {
       setLoading(true);
 
-      const {latitude, longitude} = await getCurrentLocationOnce();
+      const { latitude, longitude } = await getCurrentLocationOnce();
 
       if (latitude == null || longitude == null) {
         setLoading(false);
@@ -112,7 +112,7 @@ const CheckOutScreen: React.FC<Props> = ({ navigation }) => {
           ) : (
             <View style={styles.buttonContent}>
               <Text style={styles.buttonText}>👋 FINISH WORK</Text>
-              <Text style={styles.buttonSubText}>Tap to check out</Text>
+              {/* <Text style={styles.buttonSubText}>Tap to check out</Text> */}
             </View>
           )}
         </TouchableOpacity>

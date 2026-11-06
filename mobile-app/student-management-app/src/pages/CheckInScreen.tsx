@@ -4,9 +4,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import * as Haptics from "expo-haptics";
 import { postCheckIn } from "../api/attendanceService";
 import NetInfo from "@react-native-community/netinfo";
-import styles from "./CheckInScreen.styles"; 
+import styles from "./CheckInScreen.styles";
 import { getCurrentLocationOnce } from "../utils/location";
-import Loader from "../components/Loader"; 
+import Loader from "../components/Loader";
 import OfflineNotice from "../components/OfflineNotice";
 
 type Props = {
@@ -162,7 +162,7 @@ const CheckInScreen: React.FC<Props> = ({ navigation }) => {
           ) : (
             <View style={styles.buttonContent}>
               <Text style={styles.buttonText}>🟢 I'M HERE</Text>
-              <Text style={styles.buttonSubText}>Tap once to start work</Text>
+
             </View>
           )}
         </TouchableOpacity>

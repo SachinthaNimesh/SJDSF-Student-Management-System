@@ -1,4 +1,4 @@
-// authUtils.ts - Supports both local development switch and Azure/Choreo managed auth
+// authUtils.ts - Supports both local development switch and Azure managed auth
 import Cookies from "js-cookie";
 
 export interface UserInfo {
@@ -113,7 +113,7 @@ export async function getUserInfoFromEndpoint(): Promise<UserInfo | null> {
     console.debug("Failed to fetch from /.auth/me:", err);
   }
 
-  // 2. Fall back to /auth/userinfo endpoint (Choreo or local proxy)
+  // 2. Fall back to /auth/userinfo endpoint (Azure or local proxy)
   try {
     const response = await fetch("/auth/userinfo");
     if (response.ok) {

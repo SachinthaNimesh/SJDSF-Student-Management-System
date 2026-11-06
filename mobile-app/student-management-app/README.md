@@ -36,27 +36,23 @@ npm install
 
 ### 2. Configure Local Switch / Backend URL
 
-Open [`config/config.ts`](config/config.ts) where the **`IS_LOCAL`** switch is provided:
+Open [`config/config.ts`](config/config.ts) where the **`IS_LOCAL`** switch and hosted backend URL are defined:
 
 ```ts
-// Set to true to run locally without Azure/Choreo cloud APIs
-export const IS_LOCAL = true;
+// Set to false (default) to connect to the hosted Azure App Service backend
+export const IS_LOCAL = false;
 
-// Configure local host: 'localhost' for iOS simulator, '10.0.2.2' for Android emulator, or LAN IP for phone
-export const LOCAL_HOST = "localhost";
-export const LOCAL_PORT = "8080";
+// Production Azure App Service backend URL
+export const AZURE_PRODUCTION_URL =
+  "https://worky-backend-ftc9fbeedke6eaey.southindia-01.azurewebsites.net";
 
-export const LOCAL_BASE_URL = `http://${LOCAL_HOST}:${LOCAL_PORT}`;
-export const CHOREO_BASE_URL =
-  "https://87e89eab-95e5-4c0f-8192-7ee0196e1581-prod.e1-us-east-azure.choreoapis.dev/student-management-system/backend/v1.0";
-
-export const BASE_URL = IS_LOCAL ? LOCAL_BASE_URL : CHOREO_BASE_URL;
+export const BASE_URL = IS_LOCAL ? LOCAL_BASE_URL : CLOUD_BASE_URL;
 ```
 
-* **iOS Simulator / Web**: Keep `LOCAL_HOST = "localhost"`.
-* **Android Studio Emulator**: Change `LOCAL_HOST = "10.0.2.2"`.
-* **Physical Device with Expo Go**: Change `LOCAL_HOST` to your computer's local Wi-Fi IP address (run `ipconfig getifaddr en0` on macOS, e.g. `192.168.1.15`). Both devices must be on the same Wi-Fi.
-* **Testing Local OTP**: When `IS_LOCAL = true`, the OTP login screen offers a **"Local Dev: Autofill Seeded OTP (1001)"** button to log into student ID 1 instantly!
+* **Hosted Cloud Backend**: By default (`IS_LOCAL = false`), the app connects to the live Azure App Service backend at `https://worky-backend-ftc9fbeedke6eaey.southindia-01.azurewebsites.net`.
+* **Local Development**: Set `IS_LOCAL = true` (or set `EXPO_PUBLIC_IS_LOCAL=true`) if running against a local Go backend on port 8080.
+* **Testing Local OTP**: When `IS_LOCAL = true`, the OTP login screen offers a **"Local Dev: Autofill Seeded OTP (1001)"** button to log into student ID 1 instantly. In production/cloud mode (`IS_LOCAL = false`), this dev shortcut is automatically hidden.
+
 
 ---
 

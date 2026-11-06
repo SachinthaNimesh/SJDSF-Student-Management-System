@@ -34,7 +34,7 @@ apiClient.interceptors.response.use(
       if (status === 401 || status === 403) {
         console.warn('Authentication error detected:', status);
         
-        // Only redirect to Azure /auth/login in cloud/Choreo mode
+        // Only redirect to Azure login in cloud mode
         if (!isLocalAuth()) {
           // Clear any stored user info
           localStorage.removeItem('userInfo');

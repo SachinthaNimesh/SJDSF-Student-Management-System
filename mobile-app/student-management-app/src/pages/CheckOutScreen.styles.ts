@@ -63,14 +63,9 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontSize: 22,
     fontWeight: "800",
-    letterSpacing: 0.5,
     textTransform: "uppercase",
-  },
-  buttonSubText: {
-    color: "rgba(255, 255, 255, 0.95)",
-    fontSize: 14,
-    fontWeight: "600",
-    marginTop: 4,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

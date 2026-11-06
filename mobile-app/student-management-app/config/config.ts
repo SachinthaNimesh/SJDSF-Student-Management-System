@@ -2,11 +2,19 @@ import Constants from "expo-constants";
 import { Platform } from "react-native";
 
 /**
- * Local switch to run locally without Azure/Choreo cloud backend
- * Set `IS_LOCAL = true` for local development against local Go server (default: port 8080)
- * Set `IS_LOCAL = false` for production Choreo deployment
+ * Production Hosted Azure App Service Backend URL
  */
-export const IS_LOCAL = true;
+export const AZURE_PRODUCTION_URL =
+  "https://worky-backend-ftc9fbeedke6eaey.southindia-01.azurewebsites.net";
+
+/**
+ * Local / Cloud Switch:
+ * - Set `IS_LOCAL = false` to connect to the hosted Azure App Service backend.
+ * - Set `IS_LOCAL = true` for local development against a local Go server.
+ * - Can also be overridden at build time via `EXPO_PUBLIC_IS_LOCAL`.
+ */
+export const IS_LOCAL =
+  process.env.EXPO_PUBLIC_IS_LOCAL === "true" ? true : false;
 
 /**
  * Auto-detect local development host:
@@ -21,7 +29,17 @@ export const LOCAL_HOST =
 export const LOCAL_PORT = "8080";
 
 export const LOCAL_BASE_URL = `http://${LOCAL_HOST}:${LOCAL_PORT}`;
-export const CHOREO_BASE_URL =
-  "https://87e89eab-95e5-4c0f-8192-7ee0196e1581-prod.e1-us-east-azure.choreoapis.dev/student-management-system/backend/v1.0";
 
-export const BASE_URL = IS_LOCAL ? LOCAL_BASE_URL : CHOREO_BASE_URL;
+/**
+ * Hosted Cloud Backend URL:
+ * Defaults to the production Azure App Service.
+ * Can also be overridden at build time via `EXPO_PUBLIC_API_URL`.
+ */
+export const CLOUD_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL || AZURE_PRODUCTION_URL;
+
+/**
+ * Active API Base URL across all mobile services
+ */
+export const BASE_URL = IS_LOCAL ? LOCAL_BASE_URL : CLOUD_BASE_URL;
+

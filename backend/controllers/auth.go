@@ -265,11 +265,11 @@ func (s *AuthService) RegisterRoutes(router *mux.Router) {
 		router.HandleFunc("/auth/logout", s.HandleLocalLogout).Methods("GET", "POST", "OPTIONS")
 		router.HandleFunc("/auth/token", s.HandleLocalToken).Methods("POST", "OPTIONS")
 	} else {
-		log.Printf("[AUTH] Running in %s auth mode (expecting Choreo/Azure gateway)", authMode)
+		log.Printf("[AUTH] Running in %s auth mode (expecting Azure gateway)", authMode)
 	}
 }
 
-// HandleLocalUserInfo returns mock Azure/Choreo userinfo for local development
+// HandleLocalUserInfo returns mock Azure userinfo for local development
 func (s *AuthService) HandleLocalUserInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{

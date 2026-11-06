@@ -1,4 +1,4 @@
-// AuthContext.tsx - Coordinates authentication state supporting both local and Azure/Choreo auth
+// AuthContext.tsx - Coordinates authentication state supporting both local and Azure auth
 import React, {
   createContext,
   useContext,

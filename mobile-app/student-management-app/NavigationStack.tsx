@@ -61,7 +61,7 @@ const NavigationStack = ({ initialRoute }: { initialRoute: string }) => (
     </Stack.Screen>
     <Stack.Screen name="ParentPin">
       {(props) => (
-        <Layout>
+        <Layout headerBackgroundColor="#312e81">
           <ParentPin {...props} />
         </Layout>
       )}

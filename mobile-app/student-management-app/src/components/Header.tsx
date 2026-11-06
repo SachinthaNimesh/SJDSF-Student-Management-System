@@ -5,7 +5,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import styles from './Header.styles';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  backgroundColor?: string;
+}
+
+const Header: React.FC<HeaderProps> = ({ backgroundColor }) => {
   const [studentName, setStudentName] = React.useState<string>('');
 
   React.useEffect(() => {
@@ -40,7 +44,7 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, backgroundColor ? { backgroundColor } : null]}>
       <View style={styles.greeting}>
         <Text style={styles.greetingText}>
           Hi {studentName || '!'}

@@ -177,14 +177,13 @@ const Dashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-gradient-to-r from-blue-700 via-indigo-700 to-indigo-900 rounded-3xl p-8 text-white shadow-xl shadow-indigo-100">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-xs font-semibold backdrop-blur-md mb-3 border border-white/20">
-            <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
             Shiranee Joseph de Saram Foundation
           </div>
           <h1 className="text-3xl font-black tracking-tight text-white">
-            Trainee Attendance & Wellbeing Hub
+            Trainee Wellbeing Hub
           </h1>
           <p className="text-blue-100 text-sm mt-1">
-            Instructor Control Center • {currentDateFormatted}
+            • {currentDateFormatted}
           </p>
         </div>
 
@@ -294,43 +293,39 @@ const Dashboard = () => {
       <div className="flex flex-wrap items-center gap-2.5">
         <button
           onClick={() => setActiveFilter("all")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeFilter === "all"
-              ? "bg-slate-900 text-white shadow-sm"
-              : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-          }`}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${activeFilter === "all"
+            ? "bg-slate-900 text-white shadow-sm"
+            : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+            }`}
         >
           All Trainees ({totalEmployees})
         </button>
         <button
           onClick={() => setActiveFilter("in")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-            activeFilter === "in"
-              ? "bg-emerald-600 text-white shadow-sm"
-              : "bg-white text-slate-600 hover:bg-emerald-50 border border-slate-200"
-          }`}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${activeFilter === "in"
+            ? "bg-emerald-600 text-white shadow-sm"
+            : "bg-white text-slate-600 hover:bg-emerald-50 border border-slate-200"
+            }`}
         >
           <span className="w-2 h-2 rounded-full bg-emerald-400" />
           In Workplace ({checkedInEmployees})
         </button>
         <button
           onClick={() => setActiveFilter("out")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-            activeFilter === "out"
-              ? "bg-amber-600 text-white shadow-sm"
-              : "bg-white text-slate-600 hover:bg-amber-50 border border-slate-200"
-          }`}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${activeFilter === "out"
+            ? "bg-amber-600 text-white shadow-sm"
+            : "bg-white text-slate-600 hover:bg-amber-50 border border-slate-200"
+            }`}
         >
           <span className="w-2 h-2 rounded-full bg-amber-400" />
           In Transit ({inTransitEmployees})
         </button>
         <button
           onClick={() => setActiveFilter("home")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-            activeFilter === "home"
-              ? "bg-purple-600 text-white shadow-sm"
-              : "bg-white text-slate-600 hover:bg-purple-50 border border-slate-200"
-          }`}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${activeFilter === "home"
+            ? "bg-purple-600 text-white shadow-sm"
+            : "bg-white text-slate-600 hover:bg-purple-50 border border-slate-200"
+            }`}
         >
           <span className="w-2 h-2 rounded-full bg-purple-400" />
           Arrived Home ({arrivedHomeEmployees})
@@ -338,11 +333,10 @@ const Dashboard = () => {
         {attentionEmployees > 0 && (
           <button
             onClick={() => setActiveFilter("attention")}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeFilter === "attention"
-                ? "bg-rose-600 text-white shadow-sm"
-                : "bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200"
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${activeFilter === "attention"
+              ? "bg-rose-600 text-white shadow-sm"
+              : "bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200"
+              }`}
           >
             <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
             Needs Attention ({attentionEmployees})
@@ -365,9 +359,8 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedEmployees.map((employee) => {
             const status = getStatusForToday(employee);
-            const initials = `${employee.first_name?.[0] || ""}${
-              employee.last_name?.[0] || ""
-            }`.toUpperCase();
+            const initials = `${employee.first_name?.[0] || ""}${employee.last_name?.[0] || ""
+              }`.toUpperCase();
 
             const isAttention = employee.emotion === "sad";
 
@@ -375,11 +368,10 @@ const Dashboard = () => {
               <div
                 key={employee.student_id}
                 onClick={() => navigate(`/employee/${employee.student_id}`)}
-                className={`bg-white rounded-3xl p-6 border transition-all duration-200 hover:shadow-xl hover:-translate-y-1 cursor-pointer flex flex-col justify-between ${
-                  isAttention
-                    ? "border-rose-200 shadow-rose-50 shadow-md ring-1 ring-rose-300"
-                    : "border-slate-100 shadow-sm hover:border-indigo-100"
-                }`}
+                className={`bg-white rounded-3xl p-6 border transition-all duration-200 hover:shadow-xl hover:-translate-y-1 cursor-pointer flex flex-col justify-between ${isAttention
+                  ? "border-rose-200 shadow-rose-50 shadow-md ring-1 ring-rose-300"
+                  : "border-slate-100 shadow-sm hover:border-indigo-100"
+                  }`}
               >
                 <div>
                   {/* Top card row */}
@@ -406,14 +398,14 @@ const Dashboard = () => {
                           employee.emotion === "happy"
                             ? "#ecfdf5"
                             : employee.emotion === "sad"
-                            ? "#fff1f2"
-                            : "#f1f5f9",
+                              ? "#fff1f2"
+                              : "#f1f5f9",
                         color:
                           employee.emotion === "happy"
                             ? "#047857"
                             : employee.emotion === "sad"
-                            ? "#be123c"
-                            : "#475569",
+                              ? "#be123c"
+                              : "#475569",
                       }}
                     >
                       {employee.emotion === "happy" && <Smile className="w-3.5 h-3.5" />}

@@ -7,6 +7,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     justifyContent: "center",
+    backgroundColor: "#4f46e5",
   },
   headerSpacer: {
     height: 10,

@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 80, // Add padding to account for header height
+    paddingTop: 95, // Accounts for solid top header bar height
   },
 });
 

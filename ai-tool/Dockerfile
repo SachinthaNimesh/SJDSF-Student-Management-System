@@ -11,7 +11,7 @@ ENV FLASK_APP=summarizer.py
 ENV FLASK_ENV=production
 # Add logging environment variable for easier debugging
 ENV LOG_LEVEL=INFO
-# Choreo-specific optimizations
+# Production optimizations
 ENV GUNICORN_WORKERS=2
 ENV GUNICORN_TIMEOUT=60
 
@@ -34,7 +34,7 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 # Copy application code
 COPY . .
 
-# Create a non-root user for security (Choreo requires UID between 10000-20000)
+# Create a non-root user for security
 RUN adduser --disabled-password --gecos '' --uid 10001 appuser && \
     chown -R appuser:appuser /app && \
     # Ensure /tmp is writable (it usually is, but let's be explicit)
@@ -42,14 +42,14 @@ RUN adduser --disabled-password --gecos '' --uid 10001 appuser && \
 
 USER 10001
 
-# Expose the port (Choreo typically uses 8080)
+# Expose the default port
 EXPOSE 8080
 
 # Health check with better error handling
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD python -c "import requests; r=requests.get('http://localhost:8080/health', timeout=10); exit(0 if r.status_code==200 else 1)" || exit 1
 
-# Run the application with Choreo-optimized Gunicorn settings
+# Run the application with production Gunicorn settings
 CMD ["python", "-m", "gunicorn", \
     "--bind", "0.0.0.0:8080", \
     "--workers", "${GUNICORN_WORKERS:-2}", \

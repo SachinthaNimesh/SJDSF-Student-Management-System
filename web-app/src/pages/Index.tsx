@@ -156,8 +156,8 @@ const Index = () => {
               {isLoading
                 ? "Signing in..."
                 : isLocalAuth()
-                ? "Sign in (Local Dev)"
-                : "Login with Microsoft"}
+                  ? "Sign in (Local Dev)"
+                  : "Login with Microsoft"}
             </button>
           )}
         </div>
@@ -225,9 +225,7 @@ const Index = () => {
                 About
               </h3>
               <p className="mt-4 text-gray-600">
-                The Shiranee Joseph de Saram Foundation is a New Jersey
-                501(c)(3) non-profit organization established to support those
-                with special needs in Sri Lanka.
+                SJDSF Sri Lanka is registered with the Ministry of Social Services, NGO Secretariat (# L 04505) and Registrar of Companies (# GA 571). SJDSF (USA) is a New Jersey 501(c)(3) non-profit organization established to support the needs of neurodivergent people in Sri Lanka.
               </p>
             </div>
             <div>

@@ -401,7 +401,7 @@ def get_student_summary():
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    """Health check endpoint optimized for Choreo."""
+    """Health check endpoint for container monitoring."""
     try:
         # Basic health check
         status = {
