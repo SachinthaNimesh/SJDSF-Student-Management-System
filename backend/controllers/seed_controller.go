@@ -39,7 +39,7 @@ func GetTableCounts(db *sql.DB) (map[string]int, error) {
 	return counts, nil
 }
 
-// ExecuteSeedData truncates and populates all 10 tables with 10 records each
+// ExecuteSeedData truncates and populates all 10 tables with rich history
 func ExecuteSeedData(db *sql.DB) error {
 	if db == nil {
 		return fmt.Errorf("database connection is nil")
@@ -97,32 +97,112 @@ func ExecuteSeedData(db *sql.DB) error {
 		(10, 'Sachini', 'Herath', '2003-05-18', 'Female', '78 Hospital Road', 'Battaramulla', 'Colombo', '+94 76 000 1122', '+94 76 000 0011', 10, 'Dependable and dedicated; eager to improve software engineering skills', 79.9190, 6.8990, 10, '08:45', '17:15', '5555')`,
 		`SELECT setval('student_id_seq', (SELECT MAX(id) FROM student))`,
 
-		// 4. 10 Attendance records
+		// 4. 50 Attendance records (5 per student)
 		`INSERT INTO attendance (id, student_id, check_in_lat, check_in_long, check_in_date_time, check_out_lat, check_out_long, check_out_date_time, arrived_home_lat, arrived_home_long, arrived_home_date_time) VALUES
-		(1, 1, 6.9184, 79.8596, CURRENT_TIMESTAMP - INTERVAL '7 hours', 6.9184, 79.8596, CURRENT_TIMESTAMP - INTERVAL '1 hour', 6.8480, 79.9245, CURRENT_TIMESTAMP - INTERVAL '30 minutes'),
-		(2, 2, 6.9015, 79.8529, CURRENT_TIMESTAMP - INTERVAL '6 hours', 6.9015, 79.8529, CURRENT_TIMESTAMP - INTERVAL '30 minutes', 6.8510, 79.8672, CURRENT_TIMESTAMP - INTERVAL '10 minutes'),
-		(3, 3, 6.9210, 79.8560, CURRENT_TIMESTAMP - INTERVAL '8 hours', 6.9210, 79.8560, CURRENT_TIMESTAMP - INTERVAL '2 hours', 6.9740, 79.9180, CURRENT_TIMESTAMP - INTERVAL '1 hour'),
-		(4, 4, 6.9056, 79.8517, CURRENT_TIMESTAMP - INTERVAL '7 hours', 6.9056, 79.8517, NULL, NULL, NULL, NULL),
-		(5, 5, 6.9385, 79.8821, CURRENT_TIMESTAMP - INTERVAL '6 hours', 6.9385, 79.8821, CURRENT_TIMESTAMP - INTERVAL '15 minutes', 6.7730, 79.8820, CURRENT_TIMESTAMP - INTERVAL '5 minutes'),
-		(6, 6, 6.8772, 79.8601, CURRENT_TIMESTAMP - INTERVAL '7 hours 30 minutes', 6.8772, 79.8601, CURRENT_TIMESTAMP - INTERVAL '1 hour', 6.8650, 79.8970, CURRENT_TIMESTAMP - INTERVAL '20 minutes'),
-		(7, 7, 6.9319, 79.8504, CURRENT_TIMESTAMP - INTERVAL '8 hours', 6.9319, 79.8504, NULL, NULL, NULL, NULL),
-		(8, 8, 6.9360, 79.8450, CURRENT_TIMESTAMP - INTERVAL '6 hours', 6.9360, 79.8450, CURRENT_TIMESTAMP - INTERVAL '45 minutes', 6.8380, 79.8630, CURRENT_TIMESTAMP - INTERVAL '15 minutes'),
-		(9, 9, 6.8654, 79.8978, CURRENT_TIMESTAMP - INTERVAL '7 hours', 6.8654, 79.8978, CURRENT_TIMESTAMP - INTERVAL '2 hours', 6.9060, 79.8610, CURRENT_TIMESTAMP - INTERVAL '1 hour 15 minutes'),
-		(10, 10, 6.9247, 79.8690, CURRENT_TIMESTAMP - INTERVAL '7 hours 15 minutes', 6.9247, 79.8690, NULL, NULL, NULL, NULL)`,
+		(1, 1, 6.9184, 79.8596, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '8 hours 15 minutes', 6.9184, 79.8596, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours', 6.8480, 79.9245, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 45 minutes'),
+		(2, 1, 6.9184, 79.8596, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '8 hours 30 minutes', 6.9184, 79.8596, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes', 6.8480, 79.9245, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '18 hours'),
+		(3, 1, 6.9184, 79.8596, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '8 hours 20 minutes', 6.9184, 79.8596, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours', 6.8480, 79.9245, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 40 minutes'),
+		(4, 1, 6.9184, 79.8596, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '8 hours 35 minutes', 6.9184, 79.8596, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 10 minutes', 6.8480, 79.9245, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 55 minutes'),
+		(5, 1, 6.9184, 79.8596, CURRENT_DATE + INTERVAL '8 hours', 6.9184, 79.8596, CURRENT_DATE + INTERVAL '17 hours', 6.8480, 79.9245, CURRENT_DATE + INTERVAL '17 hours 35 minutes'),
+		(6, 2, 6.9015, 79.8529, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '8 hours 15 minutes', 6.9015, 79.8529, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours', 6.8510, 79.8672, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 45 minutes'),
+		(7, 2, 6.9015, 79.8529, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '8 hours 30 minutes', 6.9015, 79.8529, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes', 6.8510, 79.8672, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '18 hours'),
+		(8, 2, 6.9015, 79.8529, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '8 hours 20 minutes', 6.9015, 79.8529, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours', 6.8510, 79.8672, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 40 minutes'),
+		(9, 2, 6.9015, 79.8529, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '8 hours 35 minutes', 6.9015, 79.8529, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 10 minutes', 6.8510, 79.8672, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 55 minutes'),
+		(10, 2, 6.9015, 79.8529, CURRENT_DATE + INTERVAL '8 hours', 6.9015, 79.8529, CURRENT_DATE + INTERVAL '17 hours', 6.8510, 79.8672, CURRENT_DATE + INTERVAL '17 hours 35 minutes'),
+		(11, 3, 6.9210, 79.8560, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '8 hours 15 minutes', 6.9210, 79.8560, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours', 6.9740, 79.9180, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 45 minutes'),
+		(12, 3, 6.9210, 79.8560, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '8 hours 30 minutes', 6.9210, 79.8560, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes', 6.9740, 79.9180, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '18 hours'),
+		(13, 3, 6.9210, 79.8560, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '8 hours 20 minutes', 6.9210, 79.8560, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours', 6.9740, 79.9180, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 40 minutes'),
+		(14, 3, 6.9210, 79.8560, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '8 hours 35 minutes', 6.9210, 79.8560, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 10 minutes', 6.9740, 79.9180, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 55 minutes'),
+		(15, 3, 6.9210, 79.8560, CURRENT_DATE + INTERVAL '8 hours', 6.9210, 79.8560, CURRENT_DATE + INTERVAL '17 hours', 6.9740, 79.9180, CURRENT_DATE + INTERVAL '17 hours 35 minutes'),
+		(16, 4, 6.9056, 79.8517, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '8 hours 15 minutes', 6.9056, 79.8517, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours', 6.9110, 79.8940, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 45 minutes'),
+		(17, 4, 6.9056, 79.8517, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '8 hours 30 minutes', 6.9056, 79.8517, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes', 6.9110, 79.8940, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '18 hours'),
+		(18, 4, 6.9056, 79.8517, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '8 hours 20 minutes', 6.9056, 79.8517, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours', 6.9110, 79.8940, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 40 minutes'),
+		(19, 4, 6.9056, 79.8517, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '8 hours 35 minutes', 6.9056, 79.8517, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 10 minutes', 6.9110, 79.8940, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 55 minutes'),
+		(20, 4, 6.9056, 79.8517, CURRENT_DATE + INTERVAL '8 hours', NULL, NULL, NULL, NULL, NULL, NULL),
+		(21, 5, 6.9385, 79.8821, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '8 hours 15 minutes', 6.9385, 79.8821, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours', 6.7730, 79.8820, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 45 minutes'),
+		(22, 5, 6.9385, 79.8821, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '8 hours 30 minutes', 6.9385, 79.8821, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes', 6.7730, 79.8820, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '18 hours'),
+		(23, 5, 6.9385, 79.8821, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '8 hours 20 minutes', 6.9385, 79.8821, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours', 6.7730, 79.8820, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 40 minutes'),
+		(24, 5, 6.9385, 79.8821, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '8 hours 35 minutes', 6.9385, 79.8821, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 10 minutes', 6.7730, 79.8820, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 55 minutes'),
+		(25, 5, 6.9385, 79.8821, CURRENT_DATE + INTERVAL '8 hours', 6.9385, 79.8821, CURRENT_DATE + INTERVAL '17 hours', 6.7730, 79.8820, CURRENT_DATE + INTERVAL '17 hours 35 minutes'),
+		(26, 6, 6.8772, 79.8601, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '8 hours 15 minutes', 6.8772, 79.8601, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours', 6.8650, 79.8970, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 45 minutes'),
+		(27, 6, 6.8772, 79.8601, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '8 hours 30 minutes', 6.8772, 79.8601, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes', 6.8650, 79.8970, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '18 hours'),
+		(28, 6, 6.8772, 79.8601, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '8 hours 20 minutes', 6.8772, 79.8601, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours', 6.8650, 79.8970, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 40 minutes'),
+		(29, 6, 6.8772, 79.8601, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '8 hours 35 minutes', 6.8772, 79.8601, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 10 minutes', 6.8650, 79.8970, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 55 minutes'),
+		(30, 6, 6.8772, 79.8601, CURRENT_DATE + INTERVAL '8 hours', 6.8772, 79.8601, CURRENT_DATE + INTERVAL '17 hours', 6.8650, 79.8970, CURRENT_DATE + INTERVAL '17 hours 35 minutes'),
+		(31, 7, 6.9319, 79.8504, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '8 hours 15 minutes', 6.9319, 79.8504, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours', 7.0760, 79.8920, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 45 minutes'),
+		(32, 7, 6.9319, 79.8504, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '8 hours 30 minutes', 6.9319, 79.8504, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes', 7.0760, 79.8920, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '18 hours'),
+		(33, 7, 6.9319, 79.8504, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '8 hours 20 minutes', 6.9319, 79.8504, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours', 7.0760, 79.8920, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 40 minutes'),
+		(34, 7, 6.9319, 79.8504, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '8 hours 35 minutes', 6.9319, 79.8504, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 10 minutes', 7.0760, 79.8920, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 55 minutes'),
+		(35, 7, 6.9319, 79.8504, CURRENT_DATE + INTERVAL '8 hours', NULL, NULL, NULL, NULL, NULL, NULL),
+		(36, 8, 6.9360, 79.8450, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '8 hours 15 minutes', 6.9360, 79.8450, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours', 6.8380, 79.8630, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 45 minutes'),
+		(37, 8, 6.9360, 79.8450, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '8 hours 30 minutes', 6.9360, 79.8450, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes', 6.8380, 79.8630, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '18 hours'),
+		(38, 8, 6.9360, 79.8450, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '8 hours 20 minutes', 6.9360, 79.8450, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours', 6.8380, 79.8630, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 40 minutes'),
+		(39, 8, 6.9360, 79.8450, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '8 hours 35 minutes', 6.9360, 79.8450, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 10 minutes', 6.8380, 79.8630, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 55 minutes'),
+		(40, 8, 6.9360, 79.8450, CURRENT_DATE + INTERVAL '8 hours', 6.9360, 79.8450, CURRENT_DATE + INTERVAL '17 hours', 6.8380, 79.8630, CURRENT_DATE + INTERVAL '17 hours 35 minutes'),
+		(41, 9, 6.8654, 79.8978, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '8 hours 15 minutes', 6.8654, 79.8978, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours', 6.9060, 79.8610, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 45 minutes'),
+		(42, 9, 6.8654, 79.8978, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '8 hours 30 minutes', 6.8654, 79.8978, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes', 6.9060, 79.8610, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '18 hours'),
+		(43, 9, 6.8654, 79.8978, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '8 hours 20 minutes', 6.8654, 79.8978, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours', 6.9060, 79.8610, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 40 minutes'),
+		(44, 9, 6.8654, 79.8978, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '8 hours 35 minutes', 6.8654, 79.8978, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 10 minutes', 6.9060, 79.8610, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 55 minutes'),
+		(45, 9, 6.8654, 79.8978, CURRENT_DATE + INTERVAL '8 hours', 6.8654, 79.8978, CURRENT_DATE + INTERVAL '17 hours', 6.9060, 79.8610, CURRENT_DATE + INTERVAL '17 hours 35 minutes'),
+		(46, 10, 6.9247, 79.8690, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '8 hours 15 minutes', 6.9247, 79.8690, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours', 6.8990, 79.9190, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 45 minutes'),
+		(47, 10, 6.9247, 79.8690, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '8 hours 30 minutes', 6.9247, 79.8690, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes', 6.8990, 79.9190, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '18 hours'),
+		(48, 10, 6.9247, 79.8690, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '8 hours 20 minutes', 6.9247, 79.8690, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours', 6.8990, 79.9190, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 40 minutes'),
+		(49, 10, 6.9247, 79.8690, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '8 hours 35 minutes', 6.9247, 79.8690, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 10 minutes', 6.8990, 79.9190, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 55 minutes'),
+		(50, 10, 6.9247, 79.8690, CURRENT_DATE + INTERVAL '8 hours', NULL, NULL, NULL, NULL, NULL, NULL)`,
 		`SELECT setval('attendance_id_seq', (SELECT MAX(id) FROM attendance))`,
 
-		// 5. 10 Mood records
+		// 5. 50 Mood records (5 per student)
 		`INSERT INTO mood (id, student_id, recorded_at, emotion, is_daily) VALUES
-		(1, 1, CURRENT_TIMESTAMP - INTERVAL '6 hours', 'Happy', true),
-		(2, 2, CURRENT_TIMESTAMP - INTERVAL '5 hours', 'Happy', true),
-		(3, 3, CURRENT_TIMESTAMP - INTERVAL '6 hours', 'Neutral', true),
-		(4, 4, CURRENT_TIMESTAMP - INTERVAL '7 hours', 'Happy', true),
-		(5, 5, CURRENT_TIMESTAMP - INTERVAL '4 hours', 'Neutral', true),
-		(6, 6, CURRENT_TIMESTAMP - INTERVAL '6 hours', 'Sad', true),
-		(7, 7, CURRENT_TIMESTAMP - INTERVAL '5 hours', 'Happy', true),
-		(8, 8, CURRENT_TIMESTAMP - INTERVAL '4 hours', 'Neutral', true),
-		(9, 9, CURRENT_TIMESTAMP - INTERVAL '5 hours', 'Happy', true),
-		(10, 10, CURRENT_TIMESTAMP - INTERVAL '6 hours', 'Neutral', true)`,
+		(1, 1, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '9 hours 15 minutes', 'Happy', true),
+		(2, 1, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '9 hours 15 minutes', 'Focused', true),
+		(3, 1, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '9 hours 15 minutes', 'Happy', true),
+		(4, 1, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '9 hours 15 minutes', 'Energetic', true),
+		(5, 1, CURRENT_TIMESTAMP - INTERVAL '3 hours', 'Happy', true),
+		(6, 2, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '9 hours 15 minutes', 'Excited', true),
+		(7, 2, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '9 hours 15 minutes', 'Happy', true),
+		(8, 2, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '9 hours 15 minutes', 'Focused', true),
+		(9, 2, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '9 hours 15 minutes', 'Happy', true),
+		(10, 2, CURRENT_TIMESTAMP - INTERVAL '3 hours', 'Motivated', true),
+		(11, 3, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '9 hours 15 minutes', 'Calm', true),
+		(12, 3, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '9 hours 15 minutes', 'Focused', true),
+		(13, 3, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '9 hours 15 minutes', 'Neutral', true),
+		(14, 3, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '9 hours 15 minutes', 'Happy', true),
+		(15, 3, CURRENT_TIMESTAMP - INTERVAL '3 hours', 'Proud', true),
+		(16, 4, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '9 hours 15 minutes', 'Energetic', true),
+		(17, 4, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '9 hours 15 minutes', 'Happy', true),
+		(18, 4, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '9 hours 15 minutes', 'Excited', true),
+		(19, 4, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '9 hours 15 minutes', 'Focused', true),
+		(20, 4, CURRENT_TIMESTAMP - INTERVAL '3 hours', 'Happy', true),
+		(21, 5, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '9 hours 15 minutes', 'Motivated', true),
+		(22, 5, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '9 hours 15 minutes', 'Focused', true),
+		(23, 5, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '9 hours 15 minutes', 'Happy', true),
+		(24, 5, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '9 hours 15 minutes', 'Neutral', true),
+		(25, 5, CURRENT_TIMESTAMP - INTERVAL '3 hours', 'Accomplished', true),
+		(26, 6, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '9 hours 15 minutes', 'Neutral', true),
+		(27, 6, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '9 hours 15 minutes', 'Calm', true),
+		(28, 6, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '9 hours 15 minutes', 'Focused', true),
+		(29, 6, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '9 hours 15 minutes', 'Happy', true),
+		(30, 6, CURRENT_TIMESTAMP - INTERVAL '3 hours', 'Proud', true),
+		(31, 7, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '9 hours 15 minutes', 'Focused', true),
+		(32, 7, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '9 hours 15 minutes', 'Motivated', true),
+		(33, 7, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '9 hours 15 minutes', 'Happy', true),
+		(34, 7, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '9 hours 15 minutes', 'Excited', true),
+		(35, 7, CURRENT_TIMESTAMP - INTERVAL '3 hours', 'Happy', true),
+		(36, 8, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '9 hours 15 minutes', 'Calm', true),
+		(37, 8, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '9 hours 15 minutes', 'Happy', true),
+		(38, 8, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '9 hours 15 minutes', 'Focused', true),
+		(39, 8, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '9 hours 15 minutes', 'Motivated', true),
+		(40, 8, CURRENT_TIMESTAMP - INTERVAL '3 hours', 'Happy', true),
+		(41, 9, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '9 hours 15 minutes', 'Energetic', true),
+		(42, 9, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '9 hours 15 minutes', 'Happy', true),
+		(43, 9, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '9 hours 15 minutes', 'Focused', true),
+		(44, 9, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '9 hours 15 minutes', 'Accomplished', true),
+		(45, 9, CURRENT_TIMESTAMP - INTERVAL '3 hours', 'Happy', true),
+		(46, 10, (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '9 hours 15 minutes', 'Motivated', true),
+		(47, 10, (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '9 hours 15 minutes', 'Calm', true),
+		(48, 10, (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '9 hours 15 minutes', 'Focused', true),
+		(49, 10, (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '9 hours 15 minutes', 'Happy', true),
+		(50, 10, CURRENT_TIMESTAMP - INTERVAL '3 hours', 'Proud', true)`,
 		`SELECT setval('mood_id_seq', (SELECT MAX(id) FROM mood))`,
 
 		// 6. 10 Active OTPs
@@ -167,38 +247,118 @@ func ExecuteSeedData(db *sql.DB) error {
 		(10, '+94 11 119 0000', CURRENT_TIMESTAMP)`,
 		`SELECT setval('emergency_contact_id_seq', (SELECT MAX(id) FROM emergency_contact))`,
 
-		// 9. 10 Student Feedbacks
+		// 9. 50 Student Feedbacks (5 per student)
 		`INSERT INTO student_feedback (id, student_id, feedback_text, submitted_at) VALUES
-		(1, 1, 'Avantha performed exceptionally well today, helping colleagues and following all safety guidelines.', CURRENT_TIMESTAMP - INTERVAL '1 hour'),
-		(2, 2, 'Oshadi completed her daily tasks ahead of schedule with great attention to detail. Excellent team attitude.', CURRENT_TIMESTAMP - INTERVAL '45 minutes'),
-		(3, 3, 'Sahan demonstrated solid problem-solving on the assigned modules. Showed great focus throughout the shift.', CURRENT_TIMESTAMP - INTERVAL '2 hours'),
-		(4, 4, 'Tharushi was very communicative and cooperative with the entire team. Keep up the high energy!', CURRENT_TIMESTAMP - INTERVAL '3 hours'),
-		(5, 5, 'Dinuka took great initiative in organizing the workstations and supporting customer inquiries.', CURRENT_TIMESTAMP - INTERVAL '30 minutes'),
-		(6, 6, 'Nadeesha showed high dedication and precision. Worked smoothly through complex instructions.', CURRENT_TIMESTAMP - INTERVAL '1 hour 15 minutes'),
-		(7, 7, 'Isuru adapted quickly to new guidelines today and showed notable improvement in speed and quality.', CURRENT_TIMESTAMP - INTERVAL '2 hours 30 minutes'),
-		(8, 8, 'Kavindi was meticulous with testing steps and maintained a calm, positive work environment.', CURRENT_TIMESTAMP - INTERVAL '50 minutes'),
-		(9, 9, 'Bhanuka handled the afternoon rush calmly and demonstrated good situational awareness.', CURRENT_TIMESTAMP - INTERVAL '1 hour 45 minutes'),
-		(10, 10, 'Sachini was punctual, polite, and followed supervisor directions with thoroughness.', CURRENT_TIMESTAMP - INTERVAL '4 hours')`,
+		(1, 1, 'Avantha showed great initiative troubleshooting our internal network issue today.', (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 15 minutes'),
+		(2, 1, 'Smooth execution during morning standup; documented API payloads diligently.', (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes'),
+		(3, 1, 'Helped a peer integrate database migrations with zero downtime.', (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 15 minutes'),
+		(4, 1, 'Demonstrated excellent punctuality and contributed insightful unit test cases.', (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 15 minutes'),
+		(5, 1, 'Completed daily backend sprint targets ahead of schedule. Outstanding teamwork!', CURRENT_TIMESTAMP - INTERVAL '1 hour 30 minutes'),
+		(6, 2, 'Oshadi delivered clean, accessible Figma wireframes for the mobile dashboard.', (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 15 minutes'),
+		(7, 2, 'Exemplary attention to detail during our design audit session this morning.', (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes'),
+		(8, 2, 'Collaborated seamlessly with frontend developers on responsive design tokens.', (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 15 minutes'),
+		(9, 2, 'Demonstrated great patience and creativity refining our color palette contrast.', (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 15 minutes'),
+		(10, 2, 'Consistently communicates blockers early and maintains high output quality.', CURRENT_TIMESTAMP - INTERVAL '1 hour 30 minutes'),
+		(11, 3, 'Sahan implemented database indexes effectively, noticeably speeding up queries.', (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 15 minutes'),
+		(12, 3, 'Quickly grasped Docker container networking concepts during pair programming.', (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes'),
+		(13, 3, 'Showed steady focus while refactoring legacy stored procedures today.', (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 15 minutes'),
+		(14, 3, 'Great attitude during team code review; incorporated feedback proactively.', (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 15 minutes'),
+		(15, 3, 'Delivered well-structured Go controllers with thorough error handling.', CURRENT_TIMESTAMP - INTERVAL '1 hour 30 minutes'),
+		(16, 4, 'Tharushi facilitated the team sync gracefully and kept meeting action items clear.', (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 15 minutes'),
+		(17, 4, 'Delivered a detailed summary of client onboarding steps with zero omissions.', (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes'),
+		(18, 4, 'Strong interpersonal skills; handled client support tickets with high empathy.', (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 15 minutes'),
+		(19, 4, 'Maintained high productivity throughout a demanding inventory sprint.', (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 15 minutes'),
+		(20, 4, 'Very reliable and energetic; consistently lifts team spirits during peak hours.', CURRENT_TIMESTAMP - INTERVAL '1 hour 30 minutes'),
+		(21, 5, 'Dinuka organized the hardware workstation inventory accurately today.', (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 15 minutes'),
+		(22, 5, 'Diagnosed an intermittent workstation connectivity glitch quickly and calmly.', (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes'),
+		(23, 5, 'Very helpful to junior colleagues needing guidance on Linux shell commands.', (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 15 minutes'),
+		(24, 5, 'Showed exceptional discipline adhering to workplace electrical safety standards.', (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 15 minutes'),
+		(25, 5, 'Proactively updated device firmware across all test bench tablets.', CURRENT_TIMESTAMP - INTERVAL '1 hour 30 minutes'),
+		(26, 6, 'Nadeesha validated daily QA test scripts with meticulous precision.', (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 15 minutes'),
+		(27, 6, 'Identified two edge-case navigation bugs before staging deployment.', (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes'),
+		(28, 6, 'Strong analytical ability demonstrated during automated test log analysis.', (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 15 minutes'),
+		(29, 6, 'Collaborated well with the QA lead on regression test suite expansion.', (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 15 minutes'),
+		(30, 6, 'Dependable, detail-oriented, and thorough in every defect report submitted.', CURRENT_TIMESTAMP - INTERVAL '1 hour 30 minutes'),
+		(31, 7, 'Isuru showed noticeable acceleration in completing frontend pull requests.', (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 15 minutes'),
+		(32, 7, 'Adapted smoothly to the updated TypeScript linter rules and clean code practices.', (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes'),
+		(33, 7, 'Contributed solid ideas to streamline mobile app bottom tab transitions.', (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 15 minutes'),
+		(34, 7, 'Demonstrated high resilience and focus during morning deployment testing.', (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 15 minutes'),
+		(35, 7, 'Shows tremendous growth and enthusiasm for modern software craftsmanship.', CURRENT_TIMESTAMP - INTERVAL '1 hour 30 minutes'),
+		(36, 8, 'Kavindi organized the end-to-end integration test checklists methodically.', (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 15 minutes'),
+		(37, 8, 'Verified all emergency contact and checkout flows under mock conditions.', (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes'),
+		(38, 8, 'Great diligence in keeping test run documentation up-to-date and organized.', (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 15 minutes'),
+		(39, 8, 'Maintained a calm, focused presence throughout a busy release preparation.', (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 15 minutes'),
+		(40, 8, 'Superb work ethic and very thoughtful approach to automated testing tasks.', CURRENT_TIMESTAMP - INTERVAL '1 hour 30 minutes'),
+		(41, 9, 'Bhanuka effectively handled server monitoring alerts during lunch peak hours.', (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 15 minutes'),
+		(42, 9, 'Demonstrated solid understanding of TLS cert verification and network routing.', (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes'),
+		(43, 9, 'Resolved staging latency complaints promptly by inspecting connection pools.', (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 15 minutes'),
+		(44, 9, 'Communicates technical observations clearly and acts decisively under pressure.', (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 15 minutes'),
+		(45, 9, 'A reliable, disciplined team player with an exceptional learning curve.', CURRENT_TIMESTAMP - INTERVAL '1 hour 30 minutes'),
+		(46, 10, 'Sachini completed trainee project deliverables on time with high visual polish.', (CURRENT_DATE - INTERVAL '4 days') + INTERVAL '17 hours 15 minutes'),
+		(47, 10, 'Showed genuine enthusiasm while learning cloud infrastructure fundamentals.', (CURRENT_DATE - INTERVAL '3 days') + INTERVAL '17 hours 15 minutes'),
+		(48, 10, 'Prepared clear, easy-to-follow user guides for internal portal onboarding.', (CURRENT_DATE - INTERVAL '2 days') + INTERVAL '17 hours 15 minutes'),
+		(49, 10, 'Punctual, attentive, and followed supervisor instructions with great care.', (CURRENT_DATE - INTERVAL '1 day') + INTERVAL '17 hours 15 minutes'),
+		(50, 10, 'Consistently delivers quality work and demonstrates wonderful team spirit.', CURRENT_TIMESTAMP - INTERVAL '1 hour 30 minutes')`,
 		`SELECT setval('student_feedback_id_seq', (SELECT MAX(id) FROM student_feedback))`,
 
-		// 10. 10 Student Locations
+		// 10. 50 Student Locations (5 per student)
 		`INSERT INTO student_locations (id, student_id, latitude, longitude, accuracy, recorded_at) VALUES
-		(1, 1, 6.9184, 79.8596, 5.2, CURRENT_TIMESTAMP - INTERVAL '50 minutes'),
-		(2, 2, 6.9015, 79.8529, 6.1, CURRENT_TIMESTAMP - INTERVAL '40 minutes'),
-		(3, 3, 6.9210, 79.8560, 4.8, CURRENT_TIMESTAMP - INTERVAL '1 hour 30 minutes'),
-		(4, 4, 6.9056, 79.8517, 8.0, CURRENT_TIMESTAMP - INTERVAL '2 hours'),
-		(5, 5, 6.9385, 79.8821, 5.0, CURRENT_TIMESTAMP - INTERVAL '25 minutes'),
-		(6, 6, 6.8772, 79.8601, 7.3, CURRENT_TIMESTAMP - INTERVAL '1 hour'),
-		(7, 7, 6.9319, 79.8504, 6.5, CURRENT_TIMESTAMP - INTERVAL '2 hours 15 minutes'),
-		(8, 8, 6.9360, 79.8450, 4.2, CURRENT_TIMESTAMP - INTERVAL '35 minutes'),
-		(9, 9, 6.8654, 79.8978, 5.9, CURRENT_TIMESTAMP - INTERVAL '1 hour 20 minutes'),
-		(10, 10, 6.9247, 79.8690, 6.0, CURRENT_TIMESTAMP - INTERVAL '3 hours 45 minutes')`,
+		(1, 1, 6.848, 79.9245, 5.0, CURRENT_DATE + INTERVAL '8 hours'),
+		(2, 1, 6.8762, 79.8985, 12.5, CURRENT_DATE + INTERVAL '8 hours 15 minutes'),
+		(3, 1, 6.9184, 79.8596, 4.5, CURRENT_DATE + INTERVAL '8 hours 30 minutes'),
+		(4, 1, 6.9196, 79.8611, 6.0, CURRENT_DATE + INTERVAL '12 hours 30 minutes'),
+		(5, 1, 6.8973, 79.8791, 10.0, CURRENT_DATE + INTERVAL '17 hours 15 minutes'),
+		(6, 2, 6.851, 79.8672, 5.0, CURRENT_DATE + INTERVAL '8 hours'),
+		(7, 2, 6.8712, 79.8615, 12.5, CURRENT_DATE + INTERVAL '8 hours 15 minutes'),
+		(8, 2, 6.9015, 79.8529, 4.5, CURRENT_DATE + INTERVAL '8 hours 30 minutes'),
+		(9, 2, 6.9027, 79.8544, 6.0, CURRENT_DATE + INTERVAL '12 hours 30 minutes'),
+		(10, 2, 6.8864, 79.8572, 10.0, CURRENT_DATE + INTERVAL '17 hours 15 minutes'),
+		(11, 3, 6.974, 79.918, 5.0, CURRENT_DATE + INTERVAL '8 hours'),
+		(12, 3, 6.9528, 79.8932, 12.5, CURRENT_DATE + INTERVAL '8 hours 15 minutes'),
+		(13, 3, 6.921, 79.856, 4.5, CURRENT_DATE + INTERVAL '8 hours 30 minutes'),
+		(14, 3, 6.9222, 79.8575, 6.0, CURRENT_DATE + INTERVAL '12 hours 30 minutes'),
+		(15, 3, 6.9369, 79.8746, 10.0, CURRENT_DATE + INTERVAL '17 hours 15 minutes'),
+		(16, 4, 6.911, 79.894, 5.0, CURRENT_DATE + INTERVAL '8 hours'),
+		(17, 4, 6.9088, 79.8771, 12.5, CURRENT_DATE + INTERVAL '8 hours 15 minutes'),
+		(18, 4, 6.9056, 79.8517, 4.5, CURRENT_DATE + INTERVAL '8 hours 30 minutes'),
+		(19, 4, 6.9068, 79.8532, 6.0, CURRENT_DATE + INTERVAL '12 hours 30 minutes'),
+		(20, 4, 6.9072, 79.8644, 10.0, CURRENT_DATE + INTERVAL '17 hours 15 minutes'),
+		(21, 5, 6.773, 79.882, 5.0, CURRENT_DATE + INTERVAL '8 hours'),
+		(22, 5, 6.8392, 79.882, 12.5, CURRENT_DATE + INTERVAL '8 hours 15 minutes'),
+		(23, 5, 6.9385, 79.8821, 4.5, CURRENT_DATE + INTERVAL '8 hours 30 minutes'),
+		(24, 5, 6.9397, 79.8836, 6.0, CURRENT_DATE + INTERVAL '12 hours 30 minutes'),
+		(25, 5, 6.8888, 79.8821, 10.0, CURRENT_DATE + INTERVAL '17 hours 15 minutes'),
+		(26, 6, 6.865, 79.897, 5.0, CURRENT_DATE + INTERVAL '8 hours'),
+		(27, 6, 6.8699, 79.8822, 12.5, CURRENT_DATE + INTERVAL '8 hours 15 minutes'),
+		(28, 6, 6.8772, 79.8601, 4.5, CURRENT_DATE + INTERVAL '8 hours 30 minutes'),
+		(29, 6, 6.8784, 79.8616, 6.0, CURRENT_DATE + INTERVAL '12 hours 30 minutes'),
+		(30, 6, 6.8735, 79.8712, 10.0, CURRENT_DATE + INTERVAL '17 hours 15 minutes'),
+		(31, 7, 7.076, 79.892, 5.0, CURRENT_DATE + INTERVAL '8 hours'),
+		(32, 7, 7.0184, 79.8754, 12.5, CURRENT_DATE + INTERVAL '8 hours 15 minutes'),
+		(33, 7, 6.9319, 79.8504, 4.5, CURRENT_DATE + INTERVAL '8 hours 30 minutes'),
+		(34, 7, 6.9331, 79.8519, 6.0, CURRENT_DATE + INTERVAL '12 hours 30 minutes'),
+		(35, 7, 6.9751, 79.8629, 10.0, CURRENT_DATE + INTERVAL '17 hours 15 minutes'),
+		(36, 8, 6.838, 79.863, 5.0, CURRENT_DATE + INTERVAL '8 hours'),
+		(37, 8, 6.8772, 79.8558, 12.5, CURRENT_DATE + INTERVAL '8 hours 15 minutes'),
+		(38, 8, 6.936, 79.845, 4.5, CURRENT_DATE + INTERVAL '8 hours 30 minutes'),
+		(39, 8, 6.9372, 79.8465, 6.0, CURRENT_DATE + INTERVAL '12 hours 30 minutes'),
+		(40, 8, 6.9066, 79.8504, 10.0, CURRENT_DATE + INTERVAL '17 hours 15 minutes'),
+		(41, 9, 6.906, 79.861, 5.0, CURRENT_DATE + INTERVAL '8 hours'),
+		(42, 9, 6.8898, 79.8757, 12.5, CURRENT_DATE + INTERVAL '8 hours 15 minutes'),
+		(43, 9, 6.8654, 79.8978, 4.5, CURRENT_DATE + INTERVAL '8 hours 30 minutes'),
+		(44, 9, 6.8666, 79.8993, 6.0, CURRENT_DATE + INTERVAL '12 hours 30 minutes'),
+		(45, 9, 6.8776, 79.8868, 10.0, CURRENT_DATE + INTERVAL '17 hours 15 minutes'),
+		(46, 10, 6.899, 79.919, 5.0, CURRENT_DATE + INTERVAL '8 hours'),
+		(47, 10, 6.9093, 79.899, 12.5, CURRENT_DATE + INTERVAL '8 hours 15 minutes'),
+		(48, 10, 6.9247, 79.869, 4.5, CURRENT_DATE + INTERVAL '8 hours 30 minutes'),
+		(49, 10, 6.9259, 79.8705, 6.0, CURRENT_DATE + INTERVAL '12 hours 30 minutes'),
+		(50, 10, 6.917, 79.884, 10.0, CURRENT_DATE + INTERVAL '17 hours 15 minutes')`,
 		`SELECT setval('student_locations_id_seq', (SELECT MAX(id) FROM student_locations))`,
 	}
 
 	for _, stmt := range statements {
 		if _, err := tx.Exec(stmt); err != nil {
-			return fmt.Errorf("failed executing statement (%s): %w", stmt, err)
+			return fmt.Errorf("failed executing statement: %w", err)
 		}
 	}
 
@@ -206,7 +366,7 @@ func ExecuteSeedData(db *sql.DB) error {
 		return fmt.Errorf("failed to commit seed transaction: %w", err)
 	}
 
-	log.Println("✅ All 10 database tables successfully seeded with 10 records each!")
+	log.Println("✅ Database successfully seeded with full history and location trails!")
 	return nil
 }
 
@@ -227,7 +387,7 @@ func SeedDatabaseHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success":      true,
-		"message":      "Database successfully populated with 10 records per table",
+		"message":      "Database successfully populated with extended history (at least 5 records per student for attendance, mood, feedback, and location trains)",
 		"table_counts": counts,
 	})
 }
@@ -258,23 +418,37 @@ func CheckAndAutoSeed() {
 		return
 	}
 
+	// Check if any student-history table has less than 50 records (at least 5 per student)
 	needsSeed := false
-	for _, table := range TableNames {
-		if counts[table] < 10 {
+	requiredThresholds := map[string]int{
+		"supervisor":        10,
+		"employer":          10,
+		"student":           10,
+		"attendance":        50,
+		"mood":              50,
+		"otps":              10,
+		"authorized_devices": 10,
+		"emergency_contact": 10,
+		"student_feedback":  50,
+		"student_locations": 50,
+	}
+
+	for table, threshold := range requiredThresholds {
+		if counts[table] < threshold {
 			needsSeed = true
-			log.Printf("ℹ️ Table %s has %d records (< 10)", table, counts[table])
+			log.Printf("ℹ️ Table %s has %d records (needs %d)", table, counts[table], threshold)
 			break
 		}
 	}
 
 	if needsSeed {
-		log.Println("🔄 Database tables underpopulated. Seeding 10 records per table...")
+		log.Println("🔄 Database tables underpopulated. Seeding full history (at least 5 records per student)...")
 		if err := ExecuteSeedData(database.DB); err != nil {
 			log.Printf("⚠️ Auto-seed encountered an error: %v", err)
 		} else {
-			log.Println("✅ Database successfully auto-seeded with 10 records per table!")
+			log.Println("✅ Database successfully auto-seeded with 5+ records per student!")
 		}
 	} else {
-		log.Println("✅ All 10 database tables already have 10+ records. Skipping auto-seed.")
+		log.Println("✅ All database tables have required history thresholds. Skipping auto-seed.")
 	}
 }
